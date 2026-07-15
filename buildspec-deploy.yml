@@ -2,5 +2,5 @@ version: 0.2
 phases:
   build:
     commands:
-      - echo "Triggering deployment script directly on the EC2 server..."
-      - aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids "$EC2_INSTANCE_ID" --parameters 'commands=["cd /home/ubuntu/app && ./deploy.sh"]' --region $AWS_DEFAULT_REGION
+      - echo "Triggering deployment script on the EC2 server..."
+      - aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids "$EC2_INSTANCE_ID" --parameters 'commands=["cd /home/ubuntu/three-tier-app && ./deploy.sh"]' --region $AWS_DEFAULT_REGION
