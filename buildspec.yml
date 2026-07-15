@@ -20,6 +20,4 @@ phases:
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/app-tier-repo:latest
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/web-tier-repo:latest
       
-      - echo "Triggering deployment script directly on the EC2 server..."
-      # This command securely runs your local upgrade script on the destination instance
-      - aws ssm send-command --document-name "AWS-RunShellScript" --instance-ids "$EC2_INSTANCE_ID" --parameters 'commands=["cd /home/ubuntu/app && ./deploy.sh"]' --region $AWS_DEFAULT_REGION
+
