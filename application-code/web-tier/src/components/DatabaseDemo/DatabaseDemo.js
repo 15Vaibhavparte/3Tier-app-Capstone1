@@ -21,7 +21,7 @@
           }
 
         populateData(){
-            this.fetch_retry('http://13.201.69.52:4000/transaction',3)
+            this.fetch_retry('http://13.201.69.52:4000/transaction', {}, 3)
             .then(res => res.json())
             .then((data) => {
               this.setState({ transactions : data.result });
@@ -31,9 +31,9 @@
             .catch(console.log);
         }  
 
-        async fetch_retry(url, n){
+        async fetch_retry(url, options, n){
             try {
-                return await fetch(url)
+                return await fetch(url, options)
             } catch(err) {
                 if (n === 1) throw err;
                 await new Promise(resolve => setTimeout(resolve, 1000)); 
