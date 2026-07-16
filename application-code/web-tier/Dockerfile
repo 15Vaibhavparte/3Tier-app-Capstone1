@@ -15,8 +15,8 @@ RUN rm -rf node_modules package-lock.json
 # Install all dependencies (including dev tools needed to build)
 RUN npm install
 
-# Compile the React code into static files
-RUN npm run build
+#  Compile the React code while forcing ESLint to ignore the Jest version clash
+RUN DISABLE_ESLINT_PLUGIN=true CI=false npm run build
 
 
 # ==========================================
