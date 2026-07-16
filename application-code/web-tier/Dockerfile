@@ -7,19 +7,17 @@ FROM node:20-alpine AS build-stage
 WORKDIR /app
 
 # Copy dependency files first (for efficient Docker caching)
-COPY package*.json ./
+COPY . .
 
-# Force Linux to make react-scripts executable
-RUN chmod +x node_modules/.bin/react-scripts
+# Nuke any Windows/local node_modules that were accidentally copied
+RUN rm -rf node_modules package-lock.json
 
 # Install all dependencies (including dev tools needed to build)
 RUN npm install
 
-# Copy the rest of your raw source code
-COPY . .
-
 # Compile the React code into static files
 RUN npm run build
+
 
 # ==========================================
 # STAGE 2: Serve with Nginx
