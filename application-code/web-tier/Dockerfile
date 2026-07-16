@@ -1,14 +1,36 @@
-# Use a high-performance, lightweight Nginx web server base image
+# ==========================================
+# STAGE 1: Build the React application
+# ==========================================
+FROM node:20-alpine AS build-stage
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy dependency files first (for efficient Docker caching)
+COPY package*.json ./
+
+# Install all dependencies (including dev tools needed to build)
+RUN npm install
+
+# Copy the rest of your raw source code
+COPY . .
+
+# Compile the React code into static files
+RUN npm run build
+
+# ==========================================
+# STAGE 2: Serve with Nginx
+# ==========================================
 FROM nginx:alpine
 
-# Clean out any default fallback static files inside Nginx
+# Remove default Nginx placeholder files
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy your pre-compiled production build folder directly into Nginx's HTML folder
-COPY ./build /usr/share/nginx/html
+# Copy the compiled files from Stage 1 into the Nginx web root
+COPY --from=build-stage /app/build /usr/share/nginx/html
 
-# Expose port 80 for serving the static web assets
+# Expose the standard web port
 EXPOSE 80
 
-# Run Nginx in the foreground so the container stays active
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
