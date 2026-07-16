@@ -9,6 +9,9 @@ WORKDIR /app
 # Copy dependency files first (for efficient Docker caching)
 COPY package*.json ./
 
+# Force Linux to make react-scripts executable
+RUN chmod +x node_modules/.bin/react-scripts
+
 # Install all dependencies (including dev tools needed to build)
 RUN npm install
 
