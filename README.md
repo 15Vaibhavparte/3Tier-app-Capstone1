@@ -76,12 +76,11 @@ This separation improves:
 
 # Application Stack
 
-###  Cloud
+
 
 [![AWS](https://img.shields.io/badge/AWS-Cloud_Architecture-FF9900?logo=amazonaws)](https://aws.amazon.com/)
 [![Amazon EC2](https://img.shields.io/badge/Amazon_EC2-Compute-FF9900?logo=amazonec2)](https://aws.amazon.com/ec2/)
 [![Amazon Aurora](https://img.shields.io/badge/Amazon_Aurora-MySQL-527FFF?logo=amazonrds)](https://aws.amazon.com/rds/aurora/)
-[![Amazon ECR](https://img.shields.io/badge/Amazon_ECR-Container_Registry-FF9900?logo=amazonaws)](https://aws.amazon.com/ecr/)
 [![CloudFront](https://img.shields.io/badge/Amazon_CloudFront-CDN-8C4FFF?logo=amazonaws)](https://aws.amazon.com/cloudfront/)
 [![Route 53](https://img.shields.io/badge/Amazon_Route_53-DNS-8C4FFF?logo=amazonaws)](https://aws.amazon.com/route53/)
 [![CloudWatch](https://img.shields.io/badge/Amazon_CloudWatch-Monitoring-FF4F8B?logo=amazoncloudwatch)](https://aws.amazon.com/cloudwatch/)
@@ -92,21 +91,10 @@ This separation improves:
 [![Auto Scaling](https://img.shields.io/badge/AWS-Auto_Scaling-FF9900?logo=amazonaws)](https://aws.amazon.com/autoscaling/)
 [![AWS CodePipeline](https://img.shields.io/badge/AWS-CodePipeline-FF9900?logo=amazonaws)](https://aws.amazon.com/codepipeline/)
 [![Amazon ECR](https://img.shields.io/badge/Amazon_ECR-Container_Registry-FF9900?logo=amazonaws)](https://aws.amazon.com/ecr/)
-
----
-###  DevOps
-
-[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker)](https://www.docker.com/)
-[![Docker Compose](https://img.shields.io/badge/Docker_Compose-Orchestration-2496ED?logo=docker)](https://docs.docker.com/compose/)
-[![Git](https://img.shields.io/badge/Git-Version_Control-F05032?logo=git)](https://git-scm.com/)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/)
 [![Bash](https://img.shields.io/badge/Bash-Scripting-4EAA25?logo=gnubash)](https://www.gnu.org/software/bash/)
 [![AWS CLI](https://img.shields.io/badge/AWS_CLI-Automation-FF9900?logo=amazonaws)](https://aws.amazon.com/cli/)
-
-[![AWS](https://img.shields.io/badge/AWS-Cloud_Architecture-FF9900?logo=amazonaws)](https://aws.amazon.com/)
-[![Amazon EC2](https://img.shields.io/badge/Amazon_EC2-Compute-FF9900?logo=amazonec2)](https://aws.amazon.com/ec2/)
 [![Amazon Aurora](https://img.shields.io/badge/Amazon_Aurora-MySQL-527FFF?logo=amazonrds)](https://aws.amazon.com/rds/aurora/)
-[![CloudFront](https://img.shields.io/badge/CloudFront-CDN-8C4FFF?logo=amazonaws)](https://aws.amazon.com/cloudfront/)
 [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker)](https://www.docker.com/)
 [![Docker Compose](https://img.shields.io/badge/Docker_Compose-Orchestration-2496ED?logo=docker)](https://docs.docker.com/compose/)
 [![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?logo=node.js)](https://nodejs.org/)
@@ -114,7 +102,6 @@ This separation improves:
 [![Nginx](https://img.shields.io/badge/Nginx-Reverse_Proxy-009639?logo=nginx)](https://nginx.org/)
 [![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?logo=mysql)](https://www.mysql.com/)
 [![Git](https://img.shields.io/badge/Git-Version_Control-F05032?logo=git)](https://git-scm.com/)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/)
 ---
 
 #  Prerequisites & Estimated Costs
