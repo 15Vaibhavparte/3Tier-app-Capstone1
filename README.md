@@ -13,48 +13,27 @@ This project demonstrates modern **Cloud Engineering** and **DevOps** design pat
 -  High availability with Auto Scaling & Load Balancing
 
 
-#  Project Overview
+# 📖 Project Overview
 
-The primary objective of this project is to implement a **highly available**, **fault-tolerant**, and **secure** enterprise-grade application delivery platform on AWS.
+The primary objective of this project is to implement a **highly available**, **fault-tolerant**, and **secure** enterprise-grade application delivery platform on AWS using a modern **3-tier architecture**.
 
-The architecture follows a **3-tier design pattern**, separating the application into:
+| **Tier** | **Components** | **Key Features** |
+|----------|----------------|------------------|
+| 🌐 **Presentation Tier** | React, Nginx | Static asset hosting, Reverse proxy, API routing |
+| ⚙️ **Application Tier** | Node.js, Express.js | Business logic, REST APIs, Docker containers, Amazon EC2, Auto Scaling Group |
+| 🗄️ **Database Tier** | Amazon Aurora MySQL | Multi-AZ deployment, Private subnets, Automatic failover, Read replicas, High availability |
 
-##  Presentation Tier
-- React Frontend
-- Nginx Reverse Proxy
-- Static Asset Hosting
-- API Reverse Proxy
-##  Application Tier
-- Node.js
-- Express.js
-- Business Logic Layer
-- REST API
+## ✨ Architecture Benefits
 
-Runs on:
+| Benefit | Description |
+|----------|-------------|
+| 📈 **Scalability** | Scale application instances automatically based on demand. |
+| 🔒 **Security** | Network isolation using Security Groups and private database subnets. |
+| 🛠️ **Maintainability** | Independent deployment and management of each application tier. |
+| 🧩 **Fault Isolation** | Failures in one tier have minimal impact on the others. |
+| ⚡ **Operational Reliability** | High availability through Auto Scaling, ALB, and Aurora Multi-AZ. |
 
-- Docker Containers
-- Amazon EC2
-- Auto Scaling Group
-
-##  Database Tier
-Amazon Aurora MySQL
-
-Features:
-
-- Multi-AZ Deployment
-- Private Subnets
-- Automatic Failover
-- High Availability
-- Read Replica Support
-
-This separation improves:
-
-- Scalability
-- Security
-- Maintainability
-- Fault Isolation
-- Operational Reliability
----
+<br>
 
 #  Table of Contents
 
@@ -104,28 +83,32 @@ This separation improves:
 [![Git](https://img.shields.io/badge/Git-Version_Control-F05032?logo=git)](https://git-scm.com/)
 ---
 
-#  Prerequisites & Estimated Costs
+# ⚙️ Prerequisites
 
-##  Required Tools
+Before deploying the architecture, ensure the following tools are installed.
 
-- AWS CLI v2.x
-- Docker v24+
-- Docker Compose v2+
-- Git
-- Node.js v18+
-- npm v9+
+| **Tool** | **Version** | **Purpose** |
+|----------|-------------|-------------|
+| AWS CLI | v2.x+ | Manage AWS resources |
+| Docker | v24.x+ | Container runtime |
+| Docker Compose | v2.x+ | Multi-container orchestration |
+| Git | Latest | Source code management |
+| Node.js | v18.x+ | Local application development |
+| npm | v9.x+ | Package management |
 
 
-##  Zero-Downtime Deployments
 
-Deployments are performed using:
+## 🚀 Zero-Downtime Deployment
 
-- AWS Systems Manager
-- Amazon ECR
-- Docker Compose
+Continuous deployments are performed without SSH access by leveraging AWS native services.
 
-No SSH keys are required.
+| **Service** | **Role** |
+|-------------|----------|
+| 🖥️ AWS Systems Manager | Executes deployment commands remotely |
+| 📦 Amazon ECR | Stores and distributes Docker images |
+| 🐳 Docker Compose | Updates application containers with the latest images |
 
+> **No SSH keys are required.** Deployments are securely executed through **AWS Systems Manager (SSM)**.
 <br>
 
 #  Core Infrastructure Setup
@@ -245,52 +228,82 @@ The EC2 execution role enables application instances to:
 - Register with AWS Systems Manager
 - Publish logs and metrics to Amazon CloudWatch
 
----
 
-## IAM Policy
+
+## 🔐 IAM Policies
+
+The EC2 instance uses an **IAM Instance Profile** that grants only the permissions required for deployment, container management, Systems Manager access, and monitoring. This follows the **Principle of Least Privilege (PoLP)** by limiting access to only the services needed.
+
+### 📦 Amazon ECR Permissions
+
+Allows the EC2 instance to authenticate with Amazon ECR and pull Docker images during deployment.
 
 ```json
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ecr:GetAuthorizationToken",
-        "ecr:BatchCheckLayerAvailability",
-        "ecr:GetDownloadUrlForLayer",
-        "ecr:BatchGetImage"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ssm:DescribeAssociation",
-        "ssm:GetDeployablePatchSnapshotForInstance",
-        "ssm:GetDocument",
-        "ssm:DescribeDocument",
-        "ssm:GetParameters",
-        "ssm:ListAssociations",
-        "ssm:ListInstanceAssociations",
-        "ssm:Messages",
-        "ssmmessages:*"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "cloudwatch:PutMetricData",
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": "*"
-    }
-  ]
+  "Effect": "Allow",
+  "Action": [
+    "ecr:GetAuthorizationToken",
+    "ecr:BatchCheckLayerAvailability",
+    "ecr:GetDownloadUrlForLayer",
+    "ecr:BatchGetImage"
+  ],
+  "Resource": "*"
 }
 ```
+
+---
+
+### 🖥️ AWS Systems Manager (SSM) Permissions
+
+Enables secure remote management of EC2 instances through **AWS Systems Manager**, eliminating the need for SSH access.
+
+```json
+{
+  "Effect": "Allow",
+  "Action": [
+    "ssm:DescribeAssociation",
+    "ssm:GetDeployablePatchSnapshotForInstance",
+    "ssm:GetDocument",
+    "ssm:DescribeDocument",
+    "ssm:GetParameters",
+    "ssm:ListAssociations",
+    "ssm:ListInstanceAssociations",
+    "ssm:Messages",
+    "ssmmessages:*"
+  ],
+  "Resource": "*"
+}
+```
+
+---
+
+### 📊 Amazon CloudWatch & Logs Permissions
+
+Allows the instance to publish custom metrics and send application logs to **Amazon CloudWatch** for centralized monitoring and observability.
+
+```json
+{
+  "Effect": "Allow",
+  "Action": [
+    "cloudwatch:PutMetricData",
+    "logs:CreateLogGroup",
+    "logs:CreateLogStream",
+    "logs:PutLogEvents"
+  ],
+  "Resource": "*"
+}
+```
+
+---
+
+### 📌 AWS Managed Policies
+
+In addition to the custom inline policy, the following AWS managed policies are attached:
+
+| Managed Policy | Purpose |
+|---------------|---------|
+| **AmazonSSMManagedInstanceCore** | Enables Systems Manager, Session Manager, and Run Command. |
+| **AmazonEC2ContainerRegistryReadOnly** | Grants read-only access to pull Docker images from Amazon ECR. |
 
 ---
 
