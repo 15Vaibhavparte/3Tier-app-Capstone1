@@ -12,6 +12,48 @@ This project demonstrates modern **Cloud Engineering** and **DevOps** design pat
 - 🐳 Containerized application deployment
 - ⚖️ High availability with Auto Scaling & Load Balancing
 
+
+# 🎯 Project Overview
+
+The primary objective of this project is to implement a **highly available**, **fault-tolerant**, and **secure** enterprise-grade application delivery platform on AWS.
+
+The architecture follows a **3-tier design pattern**, separating the application into:
+
+## 🌐 Presentation Tier
+- React Frontend
+- Nginx Reverse Proxy
+- Static Asset Hosting
+- API Reverse Proxy
+## ⚙️ Application Tier
+- Node.js
+- Express.js
+- Business Logic Layer
+- REST API
+
+Runs on:
+
+- Docker Containers
+- Amazon EC2
+- Auto Scaling Group
+
+## 🗄️ Database Tier
+Amazon Aurora MySQL
+
+Features:
+
+- Multi-AZ Deployment
+- Private Subnets
+- Automatic Failover
+- High Availability
+- Read Replica Support
+
+This separation improves:
+
+- Scalability
+- Security
+- Maintainability
+- Fault Isolation
+- Operational Reliability
 ---
 
 # 📑 Table of Contents
@@ -32,6 +74,49 @@ This project demonstrates modern **Cloud Engineering** and **DevOps** design pat
 
 ---
 
+# Application Stack
+
+### ☁️ Cloud
+
+[![AWS](https://img.shields.io/badge/AWS-Cloud_Architecture-FF9900?logo=amazonaws)](https://aws.amazon.com/)
+[![Amazon EC2](https://img.shields.io/badge/Amazon_EC2-Compute-FF9900?logo=amazonec2)](https://aws.amazon.com/ec2/)
+[![Amazon Aurora](https://img.shields.io/badge/Amazon_Aurora-MySQL-527FFF?logo=amazonrds)](https://aws.amazon.com/rds/aurora/)
+[![Amazon ECR](https://img.shields.io/badge/Amazon_ECR-Container_Registry-FF9900?logo=amazonaws)](https://aws.amazon.com/ecr/)
+[![CloudFront](https://img.shields.io/badge/Amazon_CloudFront-CDN-8C4FFF?logo=amazonaws)](https://aws.amazon.com/cloudfront/)
+[![Route 53](https://img.shields.io/badge/Amazon_Route_53-DNS-8C4FFF?logo=amazonaws)](https://aws.amazon.com/route53/)
+[![CloudWatch](https://img.shields.io/badge/Amazon_CloudWatch-Monitoring-FF4F8B?logo=amazoncloudwatch)](https://aws.amazon.com/cloudwatch/)
+[![Systems Manager](https://img.shields.io/badge/AWS-Systems_Manager-FF9900?logo=amazonaws)](https://aws.amazon.com/systems-manager/)
+[![IAM](https://img.shields.io/badge/AWS-IAM-232F3E?logo=amazonaws)](https://aws.amazon.com/iam/)
+[![VPC](https://img.shields.io/badge/AWS-VPC-FF9900?logo=amazonaws)](https://aws.amazon.com/vpc/)
+[![Application Load Balancer](https://img.shields.io/badge/AWS-Application_Load_Balancer-FF9900?logo=amazonaws)](https://aws.amazon.com/elasticloadbalancing/)
+[![Auto Scaling](https://img.shields.io/badge/AWS-Auto_Scaling-FF9900?logo=amazonaws)](https://aws.amazon.com/autoscaling/)
+[![AWS CodePipeline](https://img.shields.io/badge/AWS-CodePipeline-FF9900?logo=amazonaws)](https://aws.amazon.com/codepipeline/)
+[![Amazon ECR](https://img.shields.io/badge/Amazon_ECR-Container_Registry-FF9900?logo=amazonaws)](https://aws.amazon.com/ecr/)
+
+---
+### ⚙️ DevOps
+
+[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker)](https://www.docker.com/)
+[![Docker Compose](https://img.shields.io/badge/Docker_Compose-Orchestration-2496ED?logo=docker)](https://docs.docker.com/compose/)
+[![Git](https://img.shields.io/badge/Git-Version_Control-F05032?logo=git)](https://git-scm.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/)
+[![Bash](https://img.shields.io/badge/Bash-Scripting-4EAA25?logo=gnubash)](https://www.gnu.org/software/bash/)
+[![AWS CLI](https://img.shields.io/badge/AWS_CLI-Automation-FF9900?logo=amazonaws)](https://aws.amazon.com/cli/)
+
+[![AWS](https://img.shields.io/badge/AWS-Cloud_Architecture-FF9900?logo=amazonaws)](https://aws.amazon.com/)
+[![Amazon EC2](https://img.shields.io/badge/Amazon_EC2-Compute-FF9900?logo=amazonec2)](https://aws.amazon.com/ec2/)
+[![Amazon Aurora](https://img.shields.io/badge/Amazon_Aurora-MySQL-527FFF?logo=amazonrds)](https://aws.amazon.com/rds/aurora/)
+[![CloudFront](https://img.shields.io/badge/CloudFront-CDN-8C4FFF?logo=amazonaws)](https://aws.amazon.com/cloudfront/)
+[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker)](https://www.docker.com/)
+[![Docker Compose](https://img.shields.io/badge/Docker_Compose-Orchestration-2496ED?logo=docker)](https://docs.docker.com/compose/)
+[![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?logo=node.js)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-Frontend-61DAFB?logo=react)](https://react.dev/)
+[![Nginx](https://img.shields.io/badge/Nginx-Reverse_Proxy-009639?logo=nginx)](https://nginx.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?logo=mysql)](https://www.mysql.com/)
+[![Git](https://img.shields.io/badge/Git-Version_Control-F05032?logo=git)](https://git-scm.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?logo=github)](https://github.com/)
+---
+
 # 📋 Prerequisites & Estimated Costs
 
 ## 🔧 Required Tools
@@ -43,158 +128,6 @@ This project demonstrates modern **Cloud Engineering** and **DevOps** design pat
 - Node.js v18+
 - npm v9+
 
----
-
-## 🔐 Required AWS IAM Permissions
-
-The deployment user should have permissions for:
-
-```text
-ec2:*
-rds:*
-cloudfront:*
-route53:*
-iam:*
-ssm:*
-ecr:*
-cloudwatch:*
-autoscaling:*
-```
-
----
-
-## 💰 Estimated Monthly AWS Cost (ap-south-1)
-
-| AWS Service | Configuration | Estimated Cost |
-|-------------|--------------|---------------:|
-| EC2 Base Instance | 1 × t3.medium | ~$30 |
-| Auto Scaling Group | 1–4 × t3.micro | ~$8.50–34 |
-| Amazon Aurora | Multi-AZ | ~$45–120 |
-| Application Load Balancer | 1 ALB | ~$22 |
-| Amazon CloudFront | <10GB Transfer | Free Tier / <$1 |
-| AWS Systems Manager | Fleet Manager | Free |
-| **Total** | Standard Environment | **~$105–187/month** |
-
----
-
-# 🎯 Project Overview
-
-The primary objective of this project is to implement a **highly available**, **fault-tolerant**, and **secure** enterprise-grade application delivery platform on AWS.
-
-The architecture follows a **3-tier design pattern**, separating the application into:
-
-- 🌐 Presentation Tier
-- ⚙️ Application Tier
-- 🗄️ Database Tier
-
-This separation improves:
-
-- Scalability
-- Security
-- Maintainability
-- Fault Isolation
-- Operational Reliability
-
----
-
-## 🏛 Architecture Overview
-
-```
-            Client Browser
-                  │
-                  ▼
-      Amazon CloudFront (CDN)
-        Edge Caching + SSL
-                  │
-                  ▼
-    Application Load Balancer
-        Public Subnets
-          Ports 80 / 443
-                  │
-      ┌───────────┴───────────┐
-      ▼                       ▼
-
-  Web/App Node 1        Web/App Node 2
- React + Nginx          Node.js Backend
- Ports:80/4000          Ports:80/4000
-
-            │
-            ▼
-
- Amazon Aurora MySQL Cluster
- Private Database Subnets
- Port 3306
-```
-
----
-
-# 🏗️ Key Architectural Pillars
-
-## 🌐 Presentation Tier
-
-- React Frontend
-- Nginx Reverse Proxy
-- Static Asset Hosting
-- API Reverse Proxy
-
----
-
-## ⚙️ Application Tier
-
-- Node.js
-- Express.js
-- Business Logic Layer
-- REST API
-
-Runs on:
-
-- Docker Containers
-- Amazon EC2
-- Auto Scaling Group
-
----
-
-## 🗄️ Data Tier
-
-Amazon Aurora MySQL
-
-Features:
-
-- Multi-AZ Deployment
-- Private Subnets
-- Automatic Failover
-- High Availability
-- Read Replica Support
-
----
-
-## 🔐 Zero Trust Security
-
-The database never accepts traffic from the internet.
-
-Traffic Flow:
-
-```
-Internet
-     │
-     ▼
-
-Load Balancer
-
-     │
-     ▼
-
-Application Servers
-
-     │
-     ▼
-
-Aurora Database
-```
-
-Database Security Groups allow **ONLY** the Application Security Group.
-
----
 
 ## 🚀 Zero-Downtime Deployments
 
@@ -206,57 +139,11 @@ Deployments are performed using:
 
 No SSH keys are required.
 
----
-
-# 🏗️ Architecture Diagram
-
-```mermaid
-graph TD
-
-User([🌐 Internet User])
-
-User --> CF[Amazon CloudFront]
-
-CF --> IGW[Internet Gateway]
-
-IGW --> ALB[Application Load Balancer]
-
-subgraph VPC["3tierapp-VPC (10.0.0.0/16)"]
-
-subgraph Public["Public Subnets"]
-
-ALB --> EC2[Base EC2 Instance]
-
-ALB --> ASG[Auto Scaling Group]
-
-end
-
-subgraph Private["Private Database Subnets"]
-
-EC2 --> Aurora[(Amazon Aurora)]
-
-ASG --> Aurora
-
-end
-
-end
-
-SSM[AWS Systems Manager]
-
-ECR[Amazon ECR]
-
-CW[Amazon CloudWatch]
-
-SSM --> EC2
-
-ECR --> EC2
-
-CW --> ASG
-```
-
----
+<br>
 
 # 🌐 Core Infrastructure Setup
+### 🏗️ Key Architectural Pillars
+![alt text](<aws infra.gif>)
 
 The entire infrastructure resides inside a dedicated VPC.
 
@@ -270,7 +157,6 @@ Availability Zones:
 
 - ap-south-1a
 - ap-south-1b
-- ap-south-1c
 
 ---
 
@@ -301,114 +187,43 @@ Availability Zones:
 | DbTier-private1 | ap-south-1a | Private | 10.0.3.0/24 | Aurora Writer |
 | DbTier-private2 | ap-south-1c | Private | 10.0.4.0/24 | Aurora Replica |
 
----
+<br>
 
 ## Security Group Matrix
 
-### 🌍 Load Balancer Security Group
+###  🔒 EC2 Instance (Application) Security Group
 
-Inbound
+### Inbound Rules
 
-- HTTP (80)
-- HTTPS (443)
+| Protocol / Port | Purpose | Allowed Source |
+|-----------------|---------|----------------|
+| **HTTP (80)** | Serves the Nginx/React frontend application | **Application Load Balancer (ALB)** |
+| **Custom TCP (4000)** | Handles Node.js backend API requests | **Application Load Balancer (ALB)** |
+| **SSH (22)** *(Optional)* | Secure shell access for administration | **Application Load Balancer (ALB)** *(or Admin IP if SSH is enabled)* |
 
-Source:
+### Outbound Rules
 
-```
-0.0.0.0/0
-```
+| Protocol | Destination |
+|----------|-------------|
+| **All Traffic** | `0.0.0.0/0` |
 
-Outbound
+<br>
 
-```
-All Traffic
-```
+## 🗄️ Amazon Aurora Database Security Group
 
----
+### Inbound Rules
 
-### ⚙️ Application Security Group
+| Protocol / Port | Purpose | Allowed Source |
+|-----------------|---------|----------------|
+| **MySQL/Aurora (3306)** | Database connections | **EC2 Instance (Application) Security Group ONLY** |
 
-Inbound
+### Outbound Rules
 
-- HTTP (80)
-- TCP (4000)
-- SSH (22) *(Optional)*
+| Protocol | Destination |
+|----------|-------------|
+| **None** | No outbound traffic allowed (Strictly Isolated) |
 
-Source
-
-```
-Application Load Balancer
-```
-
-Outbound
-
-```
-All Traffic
-```
-
----
-
-###  Database Security Group
-
-Inbound
-
-```
-MySQL 3306
-```
-
-Allowed Source
-
-```
-Application Security Group ONLY
-```
-
-Outbound
-
-```
-None
-```
-
----
-
-## Route Tables
-
-### Public Route Table
-
-```
-Destination
-
-0.0.0.0/0
-
-↓
-
-Internet Gateway
-```
-
-Associated With
-
-- AppTier-public
-- AppTier-public-2
-
----
-
-### Private Route Table
-
-```
-10.0.0.0/16
-
-↓
-
-Local
-```
-
-Associated With
-
-- DbTier-private1
-- DbTier-private2
-
-No Internet Gateway attached.
-
----
+<br>
 
 # 🔐 IAM Roles & Security Configuration
 
@@ -424,7 +239,7 @@ This allows secure access to:
 
 without exposing credentials on disk.
 
----
+
 
 ## 🛡️ EC2 Execution Role
 
@@ -496,7 +311,7 @@ The EC2 execution role enables application instances to:
 - `AmazonSSMManagedInstanceCore`
 - `AmazonEC2ContainerRegistryReadOnly`
 
----
+<br>
 
 # 💻 EC2 Instance Configuration & Deployment Automation
 
@@ -513,46 +328,47 @@ The application runs on a hardened Ubuntu Server with Docker installed.
 | IAM Role | 3Tier-EC2-Execution-Role |
 
 ---
+<br>
 
-## Deployment Strategy
+# Deployment Strategy
 
 Instead of manually connecting via SSH and updating containers, deployments are completely automated.
 
-Deployment Flow:
+## Deployment Pipeline
+![alt text](deployment.gif)
 
-```
-GitHub
+##  CI/CD Deployment Process Flow
 
-↓
+This architecture utilizes a fully automated, Zero-Touch deployment pipeline. Below is the step-by-step lifecycle of a code change from the developer's local machine to the live production environment.
 
-CI/CD Pipeline
+**1. Source Control (Push Code)**
+The deployment lifecycle begins when a developer commits and pushes code changes to the **GitHub** repository.
 
-↓
+**2. Image Build (AWS CodeBuild)**
+**AWS CodePipeline** detects the repository change and automatically triggers **AWS CodeBuild**. CodeBuild pulls the latest source code, runs any necessary tests, and builds fresh Docker images for both the Web-Tier and App-Tier.
 
-Amazon ECR
+**3. Image Registry (Amazon ECR)**
+Upon a successful build, CodeBuild securely tags and pushes the newly compiled Docker images into **Amazon Elastic Container Registry (ECR)**.
 
-↓
+**4. Deployment Trigger (AWS CodeDeploy & SSM)**
+With the images safely stored in ECR, CodePipeline moves to the Deploy stage. **AWS CodeDeploy** invokes **Amazon Systems Manager (SSM)** to securely send a deployment command to the target infrastructure, entirely bypassing the need for open SSH ports.
 
-AWS Systems Manager
+**5. Script Execution (SSM Agent)**
+The **SSM Agent**, running quietly on the target **Amazon EC2** instance within the Public Subnet, receives the deployment instruction and executes the server's local `deploy.sh` script.
 
-↓
+**6. Image Retrieval (Docker Compose)**
+The `deploy.sh` script triggers the local `docker-compose.yml` file. The EC2 instance securely authenticates with **Amazon ECR** using its IAM Role and pulls down the latest Web-Tier and App-Tier Docker images.
 
-deploy.sh
+**7. Container Orchestration (Spin Up)**
+Docker Compose gracefully tears down the outdated containers and immediately spins up the newly pulled containers. The application is now running the latest code.
 
-↓
-
-Docker Compose
-
-↓
-
-Running Containers
-```
-
+**8. Database Connectivity (Amazon Aurora)**
+The fresh App-Tier container boots up and securely establishes a connection to the **Amazon Aurora Database** residing in the isolated Private Subnet, ready to serve live, dynamic user traffic.
 This enables **zero-touch deployments**, reducing operational overhead and improving deployment consistency.
 
----
+<br>
 
-# ⚙️ Deployment Automation Script (`deploy.sh`)
+## ⚙️ Deployment Automation Script (`deploy.sh`)
 
 The deployment script resides on the EC2 instance and is executed remotely through **AWS Systems Manager Run Command** during the CI/CD pipeline.
 
@@ -593,10 +409,7 @@ docker image prune -f
 
 echo "Deployment completed successfully."
 ```
-
----
-
-## Deployment Workflow
+## `deploy.sh` Workflow
 
 The deployment script performs the following tasks:
 
@@ -608,9 +421,9 @@ The deployment script performs the following tasks:
 6. Removes unused Docker images.
 7. Completes deployment without downtime.
 
----
+<br>
 
-# 🐳 Container Orchestration (`docker-compose.yml`)
+## 🐳 Container Orchestration (`docker-compose.yml`)
 
 Application services are orchestrated using Docker Compose.
 
@@ -659,41 +472,38 @@ networks:
   app-network:
     driver: bridge
 ```
-
----
-
 ## Container Architecture
 
-```
-                 Docker Host
+```mermaid
+graph LR
 
-        ┌─────────────────────────┐
-        │                         │
-        │     web-tier            │
-        │     React + Nginx       │
-        │         │               │
-        │         ▼               │
-        │     app-tier            │
-        │ Node.js + Express API   │
-        │         │               │
-        └─────────┼───────────────┘
-                  │
-                  ▼
-         Amazon Aurora MySQL
+    subgraph DockerHost["🐳 Docker Host"]
+        Web["🌐 Web Tier<br/>React + Nginx"]
+        App["⚙️ App Tier<br/>Node.js + Express API"]
+
+        Web --> App
+    end
+
+    App --> DB[(🗄️ Amazon Aurora<br/>MySQL)]
+
+    classDef docker fill:#E3F2FD,stroke:#2496ED,stroke-width:2px,color:#000;
+    classDef database fill:#E8F5E9,stroke:#3F51B5,stroke-width:2px,color:#000;
+
+    class Web,App docker;
+    class DB database;
 ```
 
----
+<br>
 
 # 📦 Amazon Elastic Container Registry (ECR)
 
-Two private repositories are maintained inside Amazon ECR.
+- Two private repositories are maintained inside Amazon ECR.
 
 | Repository | Purpose |
 |------------|---------|
 | `web-tier-repo` | React + Nginx container |
 | `app-tier-repo` | Node.js backend container |
 
----
 
 ## Docker Build Workflow
 
@@ -711,7 +521,6 @@ docker build \
 ./application-code/app-tier
 ```
 
----
 
 ## Tag Images
 
@@ -722,8 +531,6 @@ docker tag web-tier-repo:latest \
 docker tag app-tier-repo:latest \
 168266173985.dkr.ecr.ap-south-1.amazonaws.com/app-tier-repo:latest
 ```
-
----
 
 ## Authenticate Docker with Amazon ECR
 
@@ -736,8 +543,6 @@ aws ecr get-login-password \
 168266173985.dkr.ecr.ap-south-1.amazonaws.com
 ```
 
----
-
 ## Push Images
 
 ```bash
@@ -748,79 +553,21 @@ docker push \
 168266173985.dkr.ecr.ap-south-1.amazonaws.com/app-tier-repo:latest
 ```
 
----
+## 📦 Amazon ECR Best Practices
 
-## ECR Best Practices
+| Feature | Configuration |
+|----------|---------------|
+| **Image Scanning** | ✅ Scan on Push enabled<br>✅ Vulnerability detection enabled |
+| **Image Tag** | `latest` (used for continuous deployment) |
+| **Lifecycle Policy** | Automatically deletes untagged images and images older than **14 days** to reduce storage costs and keep the registry clean. |
 
-### Image Scanning
-
-- Scan on Push enabled
-- Vulnerability detection enabled
-
----
-
-### Image Tags
-
-```
-latest
-```
-
-Used for continuous deployment.
-
----
-
-### Lifecycle Policy
-
-Automatically removes:
-
-- Untagged images
-- Images older than **14 days**
-
-This minimizes storage costs and keeps the registry clean.
-
----
-
-## Deployment Pipeline
-
-```
-Developer Pushes Code
-
-↓
-
-CI/CD Pipeline
-
-↓
-
-Docker Build
-
-↓
-
-Amazon ECR
-
-↓
-
-AWS Systems Manager
-
-↓
-
-deploy.sh
-
-↓
-
-Docker Compose
-
-↓
-
-Running Containers
-```
-
----
+<br>
 
 # ⚙️ AWS Systems Manager (SSM)
 
 To enforce a **Zero-Trust management model**, SSH access (`Port 22`) is disabled on all application instances. Administrative access is performed securely through **AWS Systems Manager Session Manager**, eliminating the need for SSH key management.
 
----
+
 
 ## Key Benefits
 
@@ -830,7 +577,7 @@ To enforce a **Zero-Trust management model**, SSH access (`Port 22`) is disabled
 - 🚀 Remote command execution
 - 🔄 Patch management and automation
 
----
+
 
 ## SSM Agent
 
@@ -848,29 +595,27 @@ After attaching the **AmazonSSMManagedInstanceCore** IAM policy, EC2 instances a
 
 Deployment workflow:
 
-```
-EC2 Instance
-      │
-      ▼
-IAM Role Attached
-      │
-      ▼
-SSM Agent Registers
-      │
-      ▼
-Fleet Manager
-      │
-      ▼
-Remote Command Execution
+```mermaid
+flowchart LR
+    EC2["🖥️ EC2 Instance"]
+    IAM["🔐 IAM Role Attached"]
+    SSM["⚙️ SSM Agent Registers"]
+    Fleet["🖥️ AWS Systems Manager<br/>Fleet Manager"]
+    Command["📜 Remote Command Execution"]
+
+    EC2 --> IAM
+    IAM --> SSM
+    SSM --> Fleet
+    Fleet --> Command
 ```
 
----
+<br>
 
 # 🗄️ Amazon Aurora Database Setup
 
 The database layer is powered by **Amazon Aurora MySQL-Compatible Edition**, providing high availability, automatic failover, and Multi-AZ replication.
 
----
+
 
 ## Cluster Configuration
 
@@ -884,26 +629,24 @@ The database layer is powered by **Amazon Aurora MySQL-Compatible Edition**, pro
 | Database Class | db.t3.medium / db.r6g.large |
 | Public Access | Disabled |
 
----
+
 
 ## Database Security
 
 The Aurora cluster resides entirely inside **private subnets**.
 
+
+Or, if you want the cross to stand alone between them:
+
+
+```mermaid
+graph LR
+    Internet["🌐 Internet"] -- "❌" --> App["🖥️ Application Server"]
+    App --> DB[("🗄️ Amazon Aurora")]
 ```
-Internet
-     ❌
-
-Application Server
-      │
-      ▼
-
-Amazon Aurora
-```
-
 Only the **Application Security Group** is allowed to communicate with the database over **TCP 3306**.
 
----
+
 
 ## Database Connectivity
 
@@ -921,161 +664,71 @@ module.exports = {
 
 This avoids hardcoding credentials into the application.
 
----
+<br>
 
-# 🌍 Content Delivery Network (CDN) & DNS Configuration
+# 🌍 DNS & Content Delivery Network (CDN)  Configuration
 
 To reduce latency and improve global performance, the application uses **Amazon CloudFront** as a Content Delivery Network.
 
----
 
-## CloudFront Configuration
 
-### Origin
+## <img src="image.png" alt="Logo" width="25">  Amazon Route 53
 
-```
-Application Load Balancer
-```
+Amazon Route 53 provides highly available DNS routing by resolving your custom domain to the CloudFront distribution. It integrates with **AWS Certificate Manager (ACM)** for SSL/TLS validation, ensuring secure HTTPS access to the application.
 
-Example:
+### DNS Flow
 
-```
-3tier-alb-12345.ap-south-1.elb.amazonaws.com
-```
+```mermaid
+graph LR
+    Domain["🌐 threetierapp.click"]
+    R53["Amazon Route 53"]
+    CF["Amazon CloudFront"]
+    ALB["Application Load Balancer"]
+    EC2["EC2 Auto Scaling Instances"]
 
----
-
-## Cache Behavior
-
-### Default Route (`*`)
-
-- Cache GET requests
-- Cache HEAD requests
-- Forward required headers
-
----
-
-### API Route (`/api/*`)
-
-Caching Disabled
-
-```
-TTL = 0
+    Domain --> R53
+    R53 --> CF
+    CF --> ALB
+    ALB --> EC2
 ```
 
-Allowed Methods
 
-- GET
-- POST
-- PUT
-- DELETE
-- OPTIONS
+## <img src="image-2.png" alt="Logo" width="25"> CloudFront Configuration  
+| Setting | Configuration |
+|----------|---------------|
+| **Origin** | Application Load Balancer |
+| **Example Origin** | `3tier-alb-12345.ap-south-1.elb.amazonaws.com` |
+| **Default Route (`*`)** | Cache **GET** & **HEAD** requests, forward required headers |
+| **API Route (`/api/*`)** | **Caching Disabled** (`TTL = 0`), allows **GET, POST, PUT, DELETE, OPTIONS**, forwards query strings & cookies |
+| **Viewer Policy** | Redirect **HTTP → HTTPS** |
 
-Query strings and cookies are forwarded to ensure dynamic API behavior.
+###  Viewer Protocol Flow
+
+```mermaid
+graph LR
+    HTTP["HTTP Request"] --> Redirect["301 Redirect"]
+    Redirect --> HTTPS["HTTPS Request"]
+```
+
+> All users accessing the application over **HTTP** are automatically redirected to **HTTPS**.
 
 ---
 
-## Viewer Protocol Policy
+###  Request Flow
 
-```
-HTTP
-
-↓
-
-Redirect
-
-↓
-
-HTTPS
+```mermaid
+graph LR
+    User[" User"] --> CF["Amazon CloudFront"]
+    CF --> ALB["Application Load Balancer"]
 ```
 
-All users are automatically redirected to HTTPS.
 
----
+<br>
 
-# 🌐 Amazon Route 53
-
-DNS is managed through Amazon Route 53.
-
-Configuration includes:
-
-- Public Hosted Zone
-- Alias Record
-- ACM SSL Validation
-- CloudFront Integration
-
-DNS Flow
-
-```
-Custom Domain
-
-↓
-
-Route53
-
-↓
-
-CloudFront
-
-↓
-
-Application Load Balancer
-
-↓
-
-EC2 Instances
-```
-
----
-
-# ⚖️ Auto Scaling & Load Balancing
+# <img src="image-1.png" alt="Logo" width="25"> Auto Scaling & Load Balancing
 
 The application automatically adjusts compute capacity using an **Application Load Balancer** and an **Auto Scaling Group**.
-
----
-
-## Application Load Balancer
-
-### Listeners
-
-| Port | Purpose |
-|------|---------|
-| 80 | HTTP |
-| 443 | HTTPS |
-
----
-
-### Target Group
-
-```
-3tier-app-tg
-```
-
-Health Check
-
-```
-/
-
-or
-
-/health
-```
-
-Health Check Interval
-
-```
-30 Seconds
-```
-
-Healthy Threshold
-
-```
-2 Successful Checks
-```
-
----
-
-# 🚀 Launch Template
+## 🚀 Launch Template
 
 Auto Scaling instances are launched using a reusable Launch Template.
 
@@ -1087,324 +740,129 @@ Configuration:
 - User Data Script
 - Detailed Monitoring Enabled
 
+
+## Application Load Balancer
+
+### Listeners
+
+| Port | Purpose |
+|------|---------|
+| 80 | HTTP |
+| 443 | HTTPS |
+
+
+
+### 🎯 Target Group Configuration
 ---
+| Setting | Value |
+|---------|-------|
+| **Target Group** | `3tier-app-tg` |
+| **Health Check Path** | `/` or `/health` |
+| **Health Check Interval** | `30 Seconds` |
+| **Healthy Threshold** | `2 Successful Checks` |
 
-# 📈 Auto Scaling Group
+<br>
 
-Configuration
+# 📈 Auto Scaling Group (ASG)
+
+Amazon EC2 Auto Scaling automatically adjusts the number of EC2 instances based on application demand, ensuring high availability while optimizing infrastructure costs. Instances are distributed across multiple Availability Zones to improve fault tolerance and resiliency.
+
+### ⚙️ Configuration
 
 | Property | Value |
 |----------|-------|
-| Minimum Capacity | 1 |
-| Desired Capacity | 1 |
-| Maximum Capacity | 4 |
-
-Deployment spans multiple Availability Zones for improved fault tolerance.
+| **Minimum Capacity** | 1 |
+| **Desired Capacity** | 1 |
+| **Maximum Capacity** | 4 |
 
 ---
 
-## Scaling Policy
+### 📊 Scaling Policy
 
-Metric
+| Metric | Scale Out | Action | Cooldown |
+|--------|-----------|--------|----------|
+| **CPUUtilization** | **CPU > 70%** | **+1 EC2 Instance** | **300 Seconds** |
 
-```
-CPUUtilization
-```
 
-Scale Out
 
-```
-CPU > 70%
-```
+## 📈 Scaling Workflow
 
-Action
+```mermaid
+flowchart LR
+    Traffic["📈 Traffic"]
+    ALB["ALB"]
+    CW["CloudWatch<br/>CPU > 70%"]
+    ASG["Auto Scaling Group"]
+    Instance["New EC2 Instance"]
 
-```
-+1 Instance
-```
+    Traffic --> ALB
+    ALB --> CW
+    CW --> ASG
+    ASG --> Instance
 
-Scale-In Cooldown
+    Instance --- Docker["🐳 Pull Images"]
+    Docker --- Target["🎯 Register with ALB"]
+```
+---
+<br>
 
-```
-300 Seconds
-```
+# 🔍 Monitoring & Observability
+
+Amazon CloudWatch provides centralized monitoring by collecting real-time metrics, logs, and alarms across the application, load balancer, and database, enabling proactive performance analysis and rapid issue detection.
+
+
+
+##  CloudWatch Dashboard
+
+###  Compute Layer
+
+- **CPU Utilization:** Monitors EC2 processor usage to identify high workload conditions.
+- **Network In:** Tracks incoming network traffic received by the instance.
+- **Network Out:** Measures outbound network traffic sent from the instance.
+- **Disk Usage:** Monitors disk space consumption and storage health.
 
 ---
 
-## Scaling Workflow
+###  Application Load Balancer
 
-```
-Traffic Spike
-
-↓
-
-Application Load Balancer
-
-↓
-
-Average CPU > 70%
-
-↓
-
-CloudWatch Alarm
-
-↓
-
-Auto Scaling Group
-
-↓
-
-Launch New EC2 Instance
-
-↓
-
-Instance Pulls Latest Docker Images
-
-↓
-
-Automatically Joins Load Balancer
-```
+- **Request Count:** Displays the total number of client requests processed.
+- **Response Time:** Measures the average time taken to serve client requests.
+- **HTTP 5XX Errors:** Tracks server-side failures returned by backend targets.
+- **Healthy Targets:** Indicates the number of healthy EC2 instances available to receive traffic.
 
 ---
 
-# 📊 Monitoring & Observability
+###  Amazon Aurora Database
 
-The platform is monitored using **Amazon CloudWatch**.
-
+- **Database Connections:** Monitors active client connections to the database.
+- **CPU Utilization:** Tracks database compute usage under workload.
+- **Select Latency:** Measures the average execution time of read (SELECT) queries.
+- **Insert Latency:** Measures the average execution time of write (INSERT) operations.
 ---
 
-## CloudWatch Dashboard
+## 🚨 CloudWatch Alarms
 
-Metrics collected include:
+CloudWatch Alarms continuously monitor key infrastructure metrics and automatically trigger scaling actions or notifications when predefined thresholds are exceeded.
 
-### Compute Layer
+| Alarm | Trigger Condition | Evaluation Period | Action |
+|-------|-------------------|-------------------|--------|
+| **🔥 High CPU Alarm** | **CPU Utilization > 70%** | **1 Minute** | Scale out the Auto Scaling Group by launching a new EC2 instance. |
+| **🗄️ Aurora Connection Alarm** | **Database Connections > 80%** | Continuous Monitoring | Send a CloudWatch notification for administrator intervention. |
 
-- CPU Utilization
-- Network In
-- Network Out
-- Disk Usage
+<br>
 
----
 
-### Load Balancer
+# 🚀 Future Scope
 
-- Request Count
-- Response Time
-- HTTP 5XX Errors
-- Healthy Targets
+This project establishes a production-ready AWS 3-tier architecture and can be extended with additional cloud-native capabilities to improve scalability, security, and operational efficiency.
 
----
-
-### Database
-
-- Database Connections
-- CPU Utilization
-- Select Latency
-- Insert Latency
-
----
-
-# 🚨 CloudWatch Alarms
-
-## High CPU Alarm
-
-Triggers when
-
-```
-CPU > 70%
-```
-
-for
-
-```
-1 Minute
-```
-
-Action
-
-```
-Scale Out
-```
-
----
-
-## Aurora Connection Alarm
-
-Triggers when
-
-```
-Database Connections
-
->
-
-80%
-```
-
-Action
-
-```
-Send CloudWatch Notification
-```
-
----
-
-# 🛠️ Troubleshooting Guide
-
-## 1. Node.js Container Cannot Connect to Database
-
-### Error
-
-```
-ECONNREFUSED 127.0.0.1:3306
-```
-
-### Cause
-
-Environment variables were not injected into Docker Compose.
-
-### Solution
-
-Ensure:
-
-- `.env` exists
-- Docker Compose references environment variables correctly
-
----
-
-## 2. Docker Pull Authorization Failed
-
-### Error
-
-```
-no basic auth credentials
-```
-
-### Cause
-
-Amazon ECR authentication token expired.
-
-### Fix
-
-```bash
-aws ecr get-login-password \
---region ap-south-1 \
-| docker login \
---username AWS \
---password-stdin <AWS_ACCOUNT_ID>.dkr.ecr.ap-south-1.amazonaws.com
-```
-
----
-
-## 3. AWS Systems Manager
-
-### Error
-
-```
-InvalidInstanceId
-```
-
-### Cause
-
-The EC2 instance was recreated but the CI/CD pipeline still references the previous instance ID.
-
-### Solution
-
-Update the environment variable:
-
-```
-EC2_INSTANCE_ID
-```
-
-Ensure the new instance has:
-
-- AmazonSSMManagedInstanceCore IAM Role
-- Running SSM Agent
-
----
-
-## 4. CloudWatch Alarm Stuck
-
-### Error
-
-```
-INSUFFICIENT_DATA
-```
-
-### Cause
-
-Detailed Monitoring is disabled.
-
-### Solution
-
-Enable:
-
-- EC2 Detailed Monitoring
-- Desired Capacity ≥ 1
-
----
-
-#  Project Highlights
-
-This project demonstrates enterprise-grade AWS architecture including:
-
--  Three-Tier Cloud Architecture
--  Custom Amazon VPC
--  Dockerized Applications
--  Amazon ECR Image Registry
--  Zero-Touch Deployments
--  AWS Systems Manager Automation
--  Amazon Aurora Multi-AZ Database
--  Amazon CloudFront CDN
--  Application Load Balancer
--  Auto Scaling Groups
--  Amazon CloudWatch Monitoring
--  Zero-Trust Security Architecture
-
----
-
-#  Technologies Used
-
-## Cloud
-
-- Amazon EC2
-- Amazon Aurora
-- Amazon CloudFront
-- Amazon Route 53
-- Amazon ECR
-- AWS Systems Manager
-- Amazon CloudWatch
-- Auto Scaling
-- Application Load Balancer
-- IAM
-- VPC
-
----
-
-## DevOps
-
-- Docker
-- Docker Compose
-- Bash
-- Git
-- GitHub
-- AWS CLI
-
----
-
-## Application Stack
-
-- React
-- Nginx
-- Node.js
-- Express.js
-- MySQL
-
----
-
-#  License
-
-This repository is intended for educational purposes and demonstrates modern AWS cloud architecture and DevOps best practices.
-
----
-
-> **Designed and engineered as part of an AWS 3-Tier Enterprise Infrastructure Portfolio, showcasing production-inspired cloud architecture, automation, scalability, and security best practices.**
+- **Infrastructure as Code (IaC):** Provision the complete infrastructure using Terraform or AWS CloudFormation.
+- **Container Orchestration:** Migrate the application from Docker Compose to Amazon ECS or Amazon EKS.
+- **Blue/Green Deployments:** Implement zero-downtime deployments using AWS CodeDeploy.
+- **Web Application Firewall:** Integrate AWS WAF and AWS Shield for enhanced application security.
+- **Secrets Management:** Replace environment variables with AWS Secrets Manager or Parameter Store.
+- **Centralized Logging:** Aggregate application logs using Amazon CloudWatch Logs and OpenSearch.
+- **Observability:** Add distributed tracing with AWS X-Ray and build advanced CloudWatch dashboards.
+- **Multi-Region Deployment:** Deploy across multiple AWS Regions using Route 53 failover routing for disaster recovery.
+- **Automated Backups:** Enable Aurora automated backups and cross-region snapshots.
+- **GitOps Workflow:** Adopt Argo CD or Flux for Kubernetes-based continuous deployment.
