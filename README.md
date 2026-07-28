@@ -13,25 +13,25 @@ This project demonstrates modern **Cloud Engineering** and **DevOps** design pat
 -  High availability with Auto Scaling & Load Balancing
 
 
-# 📖 Project Overview
+#  Project Overview
 
 The primary objective of this project is to implement a **highly available**, **fault-tolerant**, and **secure** enterprise-grade application delivery platform on AWS using a modern **3-tier architecture**.
 
 | **Tier** | **Components** | **Key Features** |
 |----------|----------------|------------------|
-| 🌐 **Presentation Tier** | React, Nginx | Static asset hosting, Reverse proxy, API routing |
-| ⚙️ **Application Tier** | Node.js, Express.js | Business logic, REST APIs, Docker containers, Amazon EC2, Auto Scaling Group |
-| 🗄️ **Database Tier** | Amazon Aurora MySQL | Multi-AZ deployment, Private subnets, Automatic failover, Read replicas, High availability |
+|  **Presentation Tier** | React, Nginx | Static asset hosting, Reverse proxy, API routing |
+|  **Application Tier** | Node.js, Express.js | Business logic, REST APIs, Docker containers, Amazon EC2, Auto Scaling Group |
+|  **Database Tier** | Amazon Aurora MySQL | Multi-AZ deployment, Private subnets, Automatic failover, Read replicas, High availability |
 
-## ✨ Architecture Benefits
+##  Architecture Benefits
 
 | Benefit | Description |
 |----------|-------------|
-| 📈 **Scalability** | Scale application instances automatically based on demand. |
-| 🔒 **Security** | Network isolation using Security Groups and private database subnets. |
-| 🛠️ **Maintainability** | Independent deployment and management of each application tier. |
-| 🧩 **Fault Isolation** | Failures in one tier have minimal impact on the others. |
-| ⚡ **Operational Reliability** | High availability through Auto Scaling, ALB, and Aurora Multi-AZ. |
+|  **Scalability** | Scale application instances automatically based on demand. |
+|  **Security** | Network isolation using Security Groups and private database subnets. |
+|  **Maintainability** | Independent deployment and management of each application tier. |
+|  **Fault Isolation** | Failures in one tier have minimal impact on the others. |
+|  **Operational Reliability** | High availability through Auto Scaling, ALB, and Aurora Multi-AZ. |
 
 <br>
 
@@ -238,7 +238,7 @@ The EC2 execution role enables application instances to:
 
 The EC2 instance uses an **IAM Instance Profile** that grants only the permissions required for deployment, container management, Systems Manager access, and monitoring. This follows the **Principle of Least Privilege (PoLP)** by limiting access to only the services needed.
 
-### 📦 Amazon ECR Permissions
+###  Amazon ECR Permissions
 
 Allows the EC2 instance to authenticate with Amazon ECR and pull Docker images during deployment.
 
@@ -257,7 +257,7 @@ Allows the EC2 instance to authenticate with Amazon ECR and pull Docker images d
 
 ---
 
-### 🖥️ AWS Systems Manager (SSM) Permissions
+###  AWS Systems Manager (SSM) Permissions
 
 Enables secure remote management of EC2 instances through **AWS Systems Manager**, eliminating the need for SSH access.
 
@@ -281,7 +281,7 @@ Enables secure remote management of EC2 instances through **AWS Systems Manager*
 
 ---
 
-### 📊 Amazon CloudWatch & Logs Permissions
+###  Amazon CloudWatch & Logs Permissions
 
 Allows the instance to publish custom metrics and send application logs to **Amazon CloudWatch** for centralized monitoring and observability.
 
@@ -300,7 +300,7 @@ Allows the instance to publish custom metrics and send application logs to **Ama
 
 ---
 
-### 📌 AWS Managed Policies
+###  AWS Managed Policies
 
 In addition to the custom inline policy, the following AWS managed policies are attached:
 
@@ -750,8 +750,8 @@ Configuration:
 
 The ALB serves as the single point of entry for internet users, distributing traffic across public subnets in multiple Availability Zones (`ap-south-1a` and `ap-south-1b`).
 
-![Application Load Balancer Overview](path/to/Screenshot_2026-07-19_204743.jpg)
-
+<img width="1400" height="700" alt="Screenshot 2026-07-19 204743" src="https://github.com/user-attachments/assets/1eaef714-f9fe-4910-bca1-94743898a1d3" />
+Application Load Balancer Overview
 
 ### ALB Specifications
 * **Name:** `3Tier-Alb`
@@ -766,7 +766,8 @@ The ALB serves as the single point of entry for internet users, distributing tra
 
 Two target groups route traffic based on incoming request paths to the backend and frontend services.
 
-![Target Groups and Registered Targets](path/to/Screenshot_2026-07-19_192130.jpg)
+<img width="1400" height="700" alt="Screenshot 2026-07-19 192130" src="https://github.com/user-attachments/assets/2ba06003-2ccd-4322-8f98-35e2ccd0c278" />
+![Target Groups and Registered Targets]
 
 ### Target Group Summary
 | Target Group Name | Port | Protocol | Target Type | VPC | Associated Load Balancer |
@@ -782,7 +783,8 @@ Two target groups route traffic based on incoming request paths to the backend a
 
 Auto Scaling instances are provisioned dynamically using a version-controlled Launch Template.
 
-![EC2 Launch Template Details](path/to/Screenshot_2026-07-19_205154.jpg)
+<img width="1400" height="700" alt="Screenshot 2026-07-19 205154" src="https://github.com/user-attachments/assets/87fea585-a983-4f2f-93a4-d76d9b762721" />
+EC2 Launch Template Details
 
 ### Launch Template Details
 * **Template Name / ID:** `AppTier-Base-Image` (`lt-0302d0de9080cb106`)
@@ -806,9 +808,12 @@ Amazon EC2 Auto Scaling automatically manages instance lifecycle, ensuring minim
 
 The Auto Scaling Group (`3Tier-ASG`) is bound to the `AppTier-Base-Image` launch template to rapidly launch identical application nodes.
 
-![Auto Scaling Group Capacity Overview](path/to/Screenshot_2026-07-19_205048.jpg)
+<img width="1400" height="700" alt="Screenshot 2026-07-19 192219" src="https://github.com/user-attachments/assets/e42bcf8c-4e20-4cde-a13d-b36eb60ed38a" />
+Auto Scaling Group Capacity Overview
 
-![ASG Details Panel](path/to/Screenshot_2026-07-19_192219.jpg)
+
+<img width="1400" height="700" alt="Screenshot 2026-07-19 205048" src="https://github.com/user-attachments/assets/6e08de41-2253-472a-ba9e-ba0b314c1670" />
+ASG Details Panel
 
 ### Capacity Limits
 * **Minimum Capacity:** `1` (Guarantees baseline availability)
@@ -823,7 +828,8 @@ The Auto Scaling Group (`3Tier-ASG`) is bound to the `AppTier-Base-Image` launch
 
 The Auto Scaling Group monitors target health via the Application Load Balancer. If an instance fails an ELB health check, the ASG automatically terminates the degraded node and launches a fresh replacement instance.
 
-![ASG Activity History](path/to/Screenshot_2026-07-19_192215.jpg)
+<img width="1400" height="700" alt="Screenshot 2026-07-19 192215" src="https://github.com/user-attachments/assets/65a49ed5-3da9-491d-b9dc-270fdb953c6e" />
+ASG Activity History
 
 ### Observed Event Audit Log
 1. **Capacity Adjustment:** Scaled from `0` to `1` instance upon initial cluster creation.
