@@ -37,19 +37,23 @@ The primary objective of this project is to implement a **highly available**, **
 
 #  Table of Contents
 
-1. [ Prerequisites & Estimated Costs](#-prerequisites--estimated-costs)
-2. [ Project Overview](#-project-overview)
-3. [ Architecture Diagram](#️-architecture-diagram)
-4. [ Core Infrastructure Setup](#-core-infrastructure-setup)
-5. [ IAM Roles & Security Configuration](#-iam-roles--security-configuration)
-6. [ EC2 Deployment & Automation](#-ec2-instance-configuration--deployment-automation)
-7. [ Amazon ECR Setup](#-amazon-ecr-setup)
-8. [ AWS Systems Manager (SSM)](#️-aws-systems-manager-ssm)
-9. [ Amazon Aurora Database](#️-amazon-aurora-database-setup)
-10. [ CloudFront & Route 53](#-content-delivery-network-cdn--dns-configuration)
-11. [ Auto Scaling & Load Balancer](#️-auto-scaling--load-balancing)
-12. [ Monitoring & Observability](#-monitoring--observability)
-13. [ Troubleshooting Guide](#️-troubleshooting-guide)
+# Table of Contents
+
+1. [ Project Overview](#-project-overview)
+2. [Application Stack](#application-stack)
+3. [ Prerequisites](#-prerequisites)
+4. [Core Infrastructure Setup](#core-infrastructure-setup)
+5. [IAM Roles & Security Configuration](#iam-roles--security-configuration)
+6. [EC2 Instance Configuration & Deployment Automation](#ec2-instance-configuration--deployment-automation)
+7. [Deployment Strategy](#deployment-strategy)
+8. [Amazon Elastic Container Registry (ECR)](#amazon-elastic-container-registry-ecr)
+9. [AWS Systems Manager (SSM)](#aws-systems-manager-ssm)
+10. [Amazon Aurora Database Setup](#amazon-aurora-database-setup)
+11. [DNS & Content Delivery Network (CDN) Configuration](#dns--content-delivery-network-cdn-configuration)
+12. [Auto Scaling & Load Balancing](#auto-scaling--load-balancing)
+13. [Auto Scaling Group (ASG)](#auto-scaling-group-asg)
+14. [Monitoring & Observability](#monitoring--observability)
+15. [Future Scope](#future-scope)
 
 ---
 
@@ -742,41 +746,89 @@ Configuration:
 - Detailed Monitoring Enabled
 
 
-## Application Load Balancer
+## 1. Application Load Balancer (`3Tier-Alb`)
 
-### Listeners
+The ALB serves as the single point of entry for internet users, distributing traffic across public subnets in multiple Availability Zones (`ap-south-1a` and `ap-south-1b`).
 
-| Port | Purpose |
-|------|---------|
-| 80 | HTTP |
-| 443 | HTTPS |
+![Application Load Balancer Overview](path/to/Screenshot_2026-07-19_204743.jpg)
 
 
+### ALB Specifications
+* **Name:** `3Tier-Alb`
+* **Scheme:** Internet-facing (IPv4)
+* **VPC:** `vpc-0b3a2086695d71981` (3tierapp-VPC)
+* **Availability Zones:** `ap-south-1a`, `ap-south-1b`
+* **DNS Name:** `3Tier-Alb-1787174336.ap-south-1.elb.amazonaws.com`
 
-###  Target Group Configuration
 ---
-| Setting | Value |
-|---------|-------|
-| **Target Group** | `3tier-app-tg` |
-| **Health Check Path** | `/` or `/health` |
-| **Health Check Interval** | `30 Seconds` |
-| **Healthy Threshold** | `2 Successful Checks` |
+
+## 2. Target Groups & Health Checks
+
+Two target groups route traffic based on incoming request paths to the backend and frontend services.
+
+![Target Groups and Registered Targets](path/to/Screenshot_2026-07-19_192130.jpg)
+
+### Target Group Summary
+| Target Group Name | Port | Protocol | Target Type | VPC | Associated Load Balancer |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`React-Target-Group`** | `80` | HTTP | Instance | `3tierapp-VPC` | `3Tier-Alb` |
+| **`Node-Target-Group`** | `4000` | HTTP | Instance | `3tierapp-VPC` | `3Tier-Alb` |
+
+> **Target Health:** As shown above, registered EC2 instances (`Apptier`) pass continuous health checks on port 80 with a status of `Healthy`.
+
+---
+
+## 3. EC2 Launch Template (`AppTier-Base-Image`)
+
+Auto Scaling instances are provisioned dynamically using a version-controlled Launch Template.
+
+![EC2 Launch Template Details](path/to/Screenshot_2026-07-19_205154.jpg)
+
+### Launch Template Details
+* **Template Name / ID:** `AppTier-Base-Image` (`lt-0302d0de9080cb106`)
+* **Default Version:** Version 5 (`fixed-monitoring`)
+* **AMI ID:** `ami-02b9ac3d3518ac013` (Pre-configured Ubuntu Base Image)
+* **Instance Type:** `t2.micro`
+* **Security Group:** `sg-08f9016c9dcdf3b85` (`3tier-app-sg`)
+* **Key Pair:** `caps1`
+
+---
 
 <br>
 
 #  Auto Scaling Group (ASG)
 
-Amazon EC2 Auto Scaling automatically adjusts the number of EC2 instances based on application demand, ensuring high availability while optimizing infrastructure costs. Instances are distributed across multiple Availability Zones to improve fault tolerance and resiliency.
-
-###  Configuration
-
-| Property | Value |
-|----------|-------|
-| **Minimum Capacity** | 1 |
-| **Desired Capacity** | 1 |
-| **Maximum Capacity** | 4 |
+Amazon EC2 Auto Scaling automatically manages instance lifecycle, ensuring minimum operational capacity while dynamically scaling out during traffic surges.
 
 ---
+
+## 1. Capacity & Launch Configuration
+
+The Auto Scaling Group (`3Tier-ASG`) is bound to the `AppTier-Base-Image` launch template to rapidly launch identical application nodes.
+
+![Auto Scaling Group Capacity Overview](path/to/Screenshot_2026-07-19_205048.jpg)
+
+![ASG Details Panel](path/to/Screenshot_2026-07-19_192219.jpg)
+
+### Capacity Limits
+* **Minimum Capacity:** `1` (Guarantees baseline availability)
+* **Desired Capacity:** `1` (Current running fleet size)
+* **Maximum Capacity:** `4` (Prevents runaway cost during spikes)
+* **Instance Health Status:** `1/1 Healthy`
+* **Availability Zones:** Spans `2 Availability Zones`
+
+---
+
+## 2. Activity History & Auto-Healing
+
+The Auto Scaling Group monitors target health via the Application Load Balancer. If an instance fails an ELB health check, the ASG automatically terminates the degraded node and launches a fresh replacement instance.
+
+![ASG Activity History](path/to/Screenshot_2026-07-19_192215.jpg)
+
+### Observed Event Audit Log
+1. **Capacity Adjustment:** Scaled from `0` to `1` instance upon initial cluster creation.
+2. **Constraint Updates:** Dynamically updated minimum/maximum instance parameters upon user configuration request.
+3. **Auto-Healing In Action:** Automatically detected an unhealthy instance (`i-0493fdd6c9a906876`) via ELB system health checks, terminated it, and immediately launched a replacement node (`i-0107416625bc8e745`).
 
 ###  Scaling Policy
 
@@ -807,13 +859,13 @@ flowchart LR
 ---
 <br>
 
-#  Monitoring & Observability
+#  <img width="25" height="25" alt="image" src="https://github.com/user-attachments/assets/b018942a-1a3f-4ca7-8e03-a3ed07a8cc37" /> Monitoring & Observability
 
 Amazon CloudWatch provides centralized monitoring by collecting real-time metrics, logs, and alarms across the application, load balancer, and database, enabling proactive performance analysis and rapid issue detection.
 
 
 
-## <img width="25" height="25" alt="image" src="https://github.com/user-attachments/assets/b018942a-1a3f-4ca7-8e03-a3ed07a8cc37" />  CloudWatch Dashboard
+##   CloudWatch Dashboard
 
 
 ###  Compute Layer
