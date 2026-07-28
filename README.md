@@ -122,6 +122,26 @@ Continuous deployments are performed without SSH access by leveraging AWS native
 
 The entire infrastructure resides inside a dedicated VPC.
 
+
+## VPC Layout & Resource Mapping
+
+The entire VPC topology spans multiple Availability Zones (`ap-south-1a`, `ap-south-1b`, and `ap-south-1c`) with isolated public and private subnets.
+
+![VPC Resource Map Topology](./assets/vpc-resource-map-overview.jpg)
+
+* **Public Subnets:** `AppTier-public` (`10.0.1.0/24`) and `Apptier-public-subnet2` (`10.0.2.0/24`) host the web and application compute nodes.
+* **Private Subnets:** `DbTier-private1` (`10.0.3.0/24`) and `DbTier-private2` (`10.0.4.0/24`) host the isolated database instances.
+
+---
+
+### Public Subnet Route Table Mapping
+
+Public subnets route outbound internet requests through a custom Route Table (`3tierapp-RT`) attached to the Internet Gateway (`3tierapp-igw`).
+
+![Public Subnet Internet Gateway Route Mapping](./assets/vpc-public-subnet-routing.jpg)
+
+---
+
 ```
 3tierapp-VPC
 CIDR:
@@ -198,6 +218,11 @@ Availability Zones:
 |----------|-------------|
 | **None** | No outbound traffic allowed (Strictly Isolated) |
 
+### Database Security Group Isolation (`3tier-rds-sg`)
+
+To enforce strict network security, the database security group permits inbound MySQL/Aurora traffic (port `3306`) exclusively from the **Application Security Group ID** (`sg-08f9016c9dcdf3b85`).
+
+![Amazon Aurora Security Group Inbound Rules](./assets/security-group-rds-rules.jpg)
 <br>
 
 #  IAM Roles & Security Configuration
@@ -320,7 +345,7 @@ In addition to the custom inline policy, the following AWS managed policies are 
 
 #  EC2 Instance Configuration & Deployment Automation
 
-The application runs on a hardened Ubuntu Server with Docker installed.
+Active compute instances are assigned both private IP addresses within the VPC CIDR block and public IP addresses for external testing.The application runs on a hardened Ubuntu Server with Docker installed.
 
 ## Base Instance Specifications
 
@@ -332,9 +357,13 @@ The application runs on a hardened Ubuntu Server with Docker installed.
 | Auto Scaling Instances | t3.micro |
 | IAM Role | 3Tier-EC2-Execution-Role |
 
----
-<br>
+![EC2 Running Instances Console](./assets/ec2-instances-summary.jpg)
 
+* **`Apptier` Instance:** `t2.medium` residing in `ap-south-1b` (Public IP: `3.109.153.132`, Private IP: `10.0.4.195`).
+* **`Dbtier` Instance:** `t3.micro` residing in `ap-south-1a` (Private IP: `13.127.247.85`).
+* **Health Checks:** Passed `2/2` status checks for system and instance reachability.
+
+<br>
 # Deployment Strategy
 
 Instead of manually connecting via SSH and updating containers, deployments are completely automated.
@@ -381,7 +410,6 @@ The deployment script resides on the EC2 instance and is executed remotely throu
 #!/bin/bash
 
 set -e
-
 # Load environment variables
 if [ -f .env ]; then
     export $(cat .env | xargs)
@@ -399,13 +427,11 @@ ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 echo "Pulling latest Docker images..."
 
 docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/web-tier-repo:latest
-
 docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/app-tier-repo:latest
 
 echo "Restarting application..."
 
 docker-compose down --remove-orphans
-
 docker-compose up -d
 
 echo "Removing unused Docker images..."
@@ -430,53 +456,59 @@ The deployment script performs the following tasks:
 
 ##  Container Orchestration (`docker-compose.yml`)
 
-Application services are orchestrated using Docker Compose.
+Once the CI/CD pipeline triggers the deployment, Docker Compose pulls the latest images from ECR and spins up the isolated application environments.
 
 ```yaml
 version: "3.8"
 
 services:
-
   web-tier:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/web-tier-repo:latest
-
     container_name: web-tier
-
     ports:
       - "80:80"
-
     restart: always
-
     depends_on:
       - app-tier
-
     networks:
       - app-network
-
   app-tier:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/app-tier-repo:latest
-
     container_name: app-tier
-
     ports:
       - "4000:4000"
-
     restart: always
-
     environment:
       - DB_HOST=${RDS_ENDPOINT}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
-
     networks:
       - app-network
-
 networks:
-
   app-network:
     driver: bridge
 ```
+
+![Docker Containers and Nginx Health Checks](./assets/container-status-healthchecks.jpg)
+
+**Command Line Verification:**
+* **Container Status (`docker ps -a`):** Confirms both the `web-tier` (React/Nginx) and `app-tier` (Node.js) containers are actively running and mapped to their respective ports (80 and 4000).
+* **Load Balancer Health Checks:** The Nginx container logs actively demonstrate the Application Load Balancer (ELB) pinging the web server and receiving continuous `HTTP/1.1 200 OK` health check responses.
+
+---
+
+## End-to-End Application Data Flow
+
+To verify the Zero-Trust network architecture and database integration, live transactions were processed through the frontend. 
+
+![React Frontend and Node.js Database Logs](./assets/container-db-connectivity.jpg)
+
+**Verification Flow:**
+1. **Presentation Tier:** The React UI successfully loads and accepts user input for database entry.
+2. **Application Tier:** The containerized Node.js backend receives the API payload and executes the SQL query. The terminal logs actively display the callback functions processing the newly added transactions (e.g., `jam`, `butter`, `bread`).
+3. **Database Tier:** Data is securely written to and retrieved from the isolated Amazon Aurora MySQL database, proving full 3-tier connectivity without public database exposure.
+
 ## Container Architecture
 
 ```mermaid
@@ -502,12 +534,40 @@ graph LR
 
 #  Amazon Elastic Container Registry (ECR)
 
-- Two private repositories are maintained inside Amazon ECR.
+Amazon ECR serves as the secure, private container registry for the 3-tier architecture. It stores version-controlled Docker container images compiled by **AWS CodeBuild** during the CI/CD pipeline and distributes them to the application compute nodes.
 
-| Repository | Purpose |
-|------------|---------|
-| `web-tier-repo` | React + Nginx container |
-| `app-tier-repo` | Node.js backend container |
+![Amazon ECR Private Repositories Listing](./assets/ecr-private-repositories.jpg)
+
+### Repository Architecture
+| Repository Name |  Tag Immutability | Encryption Type | Purpose |
+| :---  | :--- | :--- | :--- |
+| **`web-tier-repo`** | `Mutable` | `AES-256` | Stores React + Nginx web server images |
+| **`app-tier-repo`** | `Mutable` | `AES-256` | Stores Node.js + Express API backend images |
+
+## 1. Backend Application Image Registry (`app-tier-repo`)
+
+The backend repository stores compiled Node.js application images. CodeBuild tags the latest successful build as `latest`, which is subsequently pulled down by the EC2 instances during automated deployments.
+
+![Backend App Tier Image Registry](./assets/ecr-app-tier-images.jpg)
+
+### Artifact & Verification Metrics
+* **Active Image Tag:** `latest` (Maps to SHA-256 Digest: `sha256:77a026f7bf12da2...`)
+* **Image Size:** `52.06 MB`
+* **Deployment Activity:** Verified `Last pulled at` timestamp confirms successful automated image pulls executed by **Docker Compose** on the EC2 compute fleet via **AWS Systems Manager**.
+* **Build History:** Maintains chronological image build history across automated pipeline runs.
+
+---
+
+## 2. Frontend Web Image Registry (`web-tier-repo`)
+
+The frontend repository stores optimized React/Nginx static web server images produced during the build stage.
+
+![Frontend Web Tier Image Registry](./assets/ecr-web-tier-images.jpg)
+
+### Artifact & Verification Metrics
+* **Active Image Tag:** `latest` (Maps to SHA-256 Digest: `sha256:80207c1ab3170d...`)
+* **Image Size:** `26.51 MB` (Lightweight Nginx Alpine base image)
+* **Deployment Activity:** `Last pulled at` status verifies operational sync between ECR and the application instances.
 
 
 ## Docker Build Workflow
@@ -572,8 +632,6 @@ docker push \
 
 To enforce a **Zero-Trust management model**, SSH access (`Port 22`) is disabled on all application instances. Administrative access is performed securely through **AWS Systems Manager Session Manager**, eliminating the need for SSH key management.
 
-
-
 ## Key Benefits
 
 -  No SSH keys required
@@ -613,7 +671,11 @@ flowchart LR
     SSM --> Fleet
     Fleet --> Command
 ```
+![SSM Fleet Manager Managed Nodes](./assets/ssm-fleet-manager-node.jpg)
 
+* **Node ID:** `i-0278e37739dd247ff` (`Apptier`)
+* **Ping Status:** `Online` (Agent v3.3.4793.0 active)
+* **OS Platform:** Ubuntu Linux 22.04 LTS
 <br>
 
 #  Amazon Aurora Database Setup
@@ -621,19 +683,18 @@ flowchart LR
 The database layer is powered by **Amazon Aurora MySQL-Compatible Edition**, providing high availability, automatic failover, and Multi-AZ replication.
 
 
-
+![Database Connectivity and Security Details](./assets/db-connectivity-security.jpg)
 ## Cluster Configuration
 
-| Property | Value |
-|----------|-------|
-| Engine | Amazon Aurora MySQL 8.0 |
-| Cluster Name | `threetierdb-cluster` |
-| Deployment | Multi-AZ |
-| Writer | ap-south-1a |
-| Reader | ap-south-1c |
-| Database Class | db.t3.medium / db.r6g.large |
-| Public Access | Disabled |
-
+| **Property** | **Value** |
+|--------------|-----------|
+| **DB Identifier** | `threetierdb` |
+| **Engine** | MySQL Community |
+| **Instance Class** | `db.t4g.micro` |
+| **Writer** | ap-south-1a |
+| **Reader** | ap-south-1c |
+| **Port** | `3306` |
+| **Public Access** |  Disabled (Private Only) |
 
 
 ## Database Security
@@ -679,6 +740,18 @@ To reduce latency and improve global performance, the application uses **Amazon 
 
 Amazon Route 53 provides highly available DNS routing by resolving your custom domain to the CloudFront distribution. It integrates with **AWS Certificate Manager (ACM)** for SSL/TLS validation, ensuring secure HTTPS access to the application.
 
+![Amazon Route 53 Hosted Zone Records](./assets/cdn-route53-hosted-zone.jpg)
+
+### DNS Record Architecture
+| Record Name | Type | Routing | Value / Target | Purpose |
+| :--- | :--- | :--- | :--- | :--- |
+| **`threetierapp.click`** | `A (Alias)` | Simple | `d3sp451ql6epea.cloudfront.net` | Routes root domain traffic to CloudFront distribution |
+| **`threetierapp.click`** | `NS` | Simple | AWS Name Servers (`ns-558...`) | Authoritative name servers for domain delegation |
+| **`threetierapp.click`** | `SOA` | Simple | AWS Name Server Authority | Start of Authority record |
+| **`_7f35c0d...`** | `CNAME` | Simple | AWS Certificate Manager (`_cc6d3a0...`) | Automated ACM SSL/TLS domain ownership validation |
+
+---
+
 ### DNS Flow
 
 ```mermaid
@@ -695,16 +768,35 @@ graph LR
     ALB --> EC2
 ```
 
+##  AWS Certificate Manager (SSL/TLS Encryption)
+
+To enforce Zero-Trust end-to-end transport security, an **AWS-managed SSL/TLS certificate** was issued in `us-east-1` (North Virginia) to enable HTTPS across the global CloudFront edge locations.
+
+![AWS Certificate Manager ACM Status](./assets/cdn-acm-certificate.jpg)
+
+### Certificate Details
+* **Domain Name:** `threetierapp.click`
+* **Status:** `Issued` (Active & Validated)
+* **Key Spec:** `RSA 2048`
+* **Validation Method:** DNS Validation via Route 53 CNAME record insertion
+
+
+
 
 ## <img width="25" height="25" alt="image" src="https://github.com/user-attachments/assets/037b680f-40a7-4299-89f1-b2190a2445b8" />  CloudFront Configuration  
 
-| Setting | Configuration |
-|----------|---------------|
-| **Origin** | Application Load Balancer |
-| **Example Origin** | `3tier-alb-12345.ap-south-1.elb.amazonaws.com` |
-| **Default Route (`*`)** | Cache **GET** & **HEAD** requests, forward required headers |
-| **API Route (`/api/*`)** | **Caching Disabled** (`TTL = 0`), allows **GET, POST, PUT, DELETE, OPTIONS**, forwards query strings & cookies |
-| **Viewer Policy** | Redirect **HTTP → HTTPS** |
+### 🌐 CloudFront Distribution Profile
+
+![CloudFront General Settings and Alternate Domains](./assets/cdn-cloudfront-general.jpg)
+
+| **Property** | **Value** |
+|--------------|-----------|
+| **Distribution Name** | `threetierapp` |
+| **Distribution Domain** | `d3sp451ql6epea.cloudfront.net` |
+| **Alternate Domain (CNAME)** | `threetierapp.click` |
+| **Custom SSL Certificate** | `threetierapp.click` (AWS Certificate Manager) |
+| **Security Policy** | `TLSv1.2_2021` |
+| **Price Class** | All Edge Locations *(Best Performance)* |
 
 ###  Viewer Protocol Flow
 
@@ -716,7 +808,18 @@ graph LR
 
 > All users accessing the application over **HTTP** are automatically redirected to **HTTPS**.
 
----
+
+## 4. Origin & Load Balancer Integration
+
+CloudFront is configured with Elastic Load Balancing origins to forward dynamic API requests directly to the Application Load Balancer (`3Tier-Alb`).
+
+![CloudFront Origins Configuration](./assets/cdn-cloudfront-origins.jpg)
+
+### Origin Mapping
+| **Origin Name** | **Origin Endpoint** | **Origin Type** |
+|-----------------|---------------------|-----------------|
+| `EC2-Node-Backend-4000` | `3tier-alb-1787174336.ap-south-1.elb.amazonaws.com` | Application Load Balancer |
+| `EC2-Web-Tier` | `3tier-alb-1787174336.ap-south-1.elb.amazonaws.com` | Application Load Balancer |
 
 ###  Request Flow
 
@@ -725,38 +828,52 @@ graph LR
     User[" User"] --> CF["Amazon CloudFront"]
     CF --> ALB["Application Load Balancer"]
 ```
+## 5. Security & Threat Analytics (AWS WAF)
 
+Real-time telemetry and threat analytics monitor incoming traffic for suspicious behavior, cross-site scripting (XSS), and malicious IP activity before requests reach the core compute infrastructure.
+
+![CloudFront Threat Analytics Dashboard](./assets/cdn-security-analytics.jpg)
+
+### Telemetry Insights
+| **Feature** | **Description** |
+|--------------|-----------------|
+|  Request Filtering | Blocks malicious requests using custom WAF rules. |
+|  Threat Protection | Detects and mitigates XSS attacks and malicious payloads. |
+|  Geographic Analytics | Displays request distribution and threat sources by country. |
+
+
+## 6. End-to-End Live Verification (Browser Network Analysis)
+
+Live verification confirms HTTP-to-HTTPS redirection, SSL/TLS handshake execution, and CloudFront response headers on the live production domain (`https://threetierapp.click`).
+
+![Browser DevTools Live Response Headers](./assets/cdn-live-verification.jpg)
+
+### Verified Header Signatures
+| **Header** | **Observed Value** | **Purpose** |
+|------------|--------------------|-------------|
+| **Request URL** | `https://threetierapp.click/` | Confirms secure HTTPS access (`HTTP 200 OK`). |
+| **Server** | `nginx/1.31.3` | Response served by the containerized Nginx web tier. |
+| **Via** | `cloudfront.net` | Confirms traffic passed through CloudFront edge locations. |
+| **X-Cache** | `Hit from cloudfront` / `Miss from cloudfront` | Indicates CloudFront cache status for each request. |
 
 <br>
 
-# <img width="25" height="25" alt="image" src="https://github.com/user-attachments/assets/219bcc83-4a98-40ba-80cc-e85776be9640" /> Auto Scaling & Load Balancing
- 
+#  Load Balancing Tier
 
-The application automatically adjusts compute capacity using an **Application Load Balancer** and an **Auto Scaling Group**.
-##  Launch Template
+The load balancing tier acts as the public entry point for incoming application traffic, terminating client requests at the Application Load Balancer and distributing traffic across healthy compute nodes.
 
-Auto Scaling instances are launched using a reusable Launch Template.
-
-Configuration:
-
-- Ubuntu Server
-- Docker Installed
-- IAM Role Attached
-- User Data Script
-- Detailed Monitoring Enabled
-
+---
 
 ## 1. Application Load Balancer (`3Tier-Alb`)
 
-The ALB serves as the single point of entry for internet users, distributing traffic across public subnets in multiple Availability Zones (`ap-south-1a` and `ap-south-1b`).
+The internet-facing ALB distributes HTTP/HTTPS traffic across public subnets spanning multiple Availability Zones (`ap-south-1a` and `ap-south-1b`) for high availability.
 
-<img width="1400" height="700" alt="Screenshot 2026-07-19 204743" src="https://github.com/user-attachments/assets/1eaef714-f9fe-4910-bca1-94743898a1d3" />
-Application Load Balancer Overview
+<img width="1400" height="700" alt="Application Load Balancer Overview" src="https://github.com/user-attachments/assets/1eaef714-f9fe-4910-bca1-94743898a1d3" />
 
 ### ALB Specifications
 * **Name:** `3Tier-Alb`
 * **Scheme:** Internet-facing (IPv4)
-* **VPC:** `vpc-0b3a2086695d71981` (3tierapp-VPC)
+* **VPC:** `vpc-0b3a2086695d71981` (`3tierapp-VPC`)
 * **Availability Zones:** `ap-south-1a`, `ap-south-1b`
 * **DNS Name:** `3Tier-Alb-1787174336.ap-south-1.elb.amazonaws.com`
 
@@ -764,10 +881,9 @@ Application Load Balancer Overview
 
 ## 2. Target Groups & Health Checks
 
-Two target groups route traffic based on incoming request paths to the backend and frontend services.
+Traffic is routed to specific microservices/tiers based on port listeners and path-based rules. Continuous health checks ensure degraded nodes are automatically pulled out of rotation.
 
-<img width="1400" height="700" alt="Screenshot 2026-07-19 192130" src="https://github.com/user-attachments/assets/2ba06003-2ccd-4322-8f98-35e2ccd0c278" />
-![Target Groups and Registered Targets]
+<img width="1400" height="700" alt="Target Groups and Registered Targets" src="https://github.com/user-attachments/assets/2ba06003-2ccd-4322-8f98-35e2ccd0c278" />
 
 ### Target Group Summary
 | Target Group Name | Port | Protocol | Target Type | VPC | Associated Load Balancer |
@@ -775,139 +891,148 @@ Two target groups route traffic based on incoming request paths to the backend a
 | **`React-Target-Group`** | `80` | HTTP | Instance | `3tierapp-VPC` | `3Tier-Alb` |
 | **`Node-Target-Group`** | `4000` | HTTP | Instance | `3tierapp-VPC` | `3Tier-Alb` |
 
-> **Target Health:** As shown above, registered EC2 instances (`Apptier`) pass continuous health checks on port 80 with a status of `Healthy`.
+### Target Health Verification
+* **`i-0278e37739dd247ff` (`Apptier`):** Status `Healthy` in `ap-south-1b`.
+* **`i-02a7de115e13a9d1d` (`AppTier ASG`):** Status `Healthy` in `ap-south-1a`.
+* **Health Check Protocol:** HTTP ping on port `80` with 2 consecutive successful checks required for active traffic routing.
 
----
-
-## 3. EC2 Launch Template (`AppTier-Base-Image`)
-
-Auto Scaling instances are provisioned dynamically using a version-controlled Launch Template.
-
-<img width="1400" height="700" alt="Screenshot 2026-07-19 205154" src="https://github.com/user-attachments/assets/87fea585-a983-4f2f-93a4-d76d9b762721" />
-EC2 Launch Template Details
-
-### Launch Template Details
-* **Template Name / ID:** `AppTier-Base-Image` (`lt-0302d0de9080cb106`)
-* **Default Version:** Version 5 (`fixed-monitoring`)
-* **AMI ID:** `ami-02b9ac3d3518ac013` (Pre-configured Ubuntu Base Image)
-* **Instance Type:** `t2.micro`
-* **Security Group:** `sg-08f9016c9dcdf3b85` (`3tier-app-sg`)
-* **Key Pair:** `caps1`
-
----
 
 <br>
 
-#  Auto Scaling Group (ASG)
+#  Auto Scaling & Compute Provisioning
 
-Amazon EC2 Auto Scaling automatically manages instance lifecycle, ensuring minimum operational capacity while dynamically scaling out during traffic surges.
+The compute layer automatically scales instance capacity up or down based on real-time traffic demands, ensuring performance stability while optimizing infrastructure costs.
 
 ---
 
-## 1. Capacity & Launch Configuration
+## 1. EC2 Launch Template (`AppTier-Base-Image`)
 
-The Auto Scaling Group (`3Tier-ASG`) is bound to the `AppTier-Base-Image` launch template to rapidly launch identical application nodes.
+Auto Scaling instances are launched dynamically using a version-controlled Launch Template that pre-configures OS settings, security profiles, and bootstrap scripts.
 
-<img width="1400" height="700" alt="Screenshot 2026-07-19 192219" src="https://github.com/user-attachments/assets/e42bcf8c-4e20-4cde-a13d-b36eb60ed38a" />
-Auto Scaling Group Capacity Overview
+<img width="1400" height="700" alt="EC2 Launch Template Details" src="https://github.com/user-attachments/assets/87fea585-a983-4f2f-93a4-d76d9b762721" />
 
+### Launch Template Specifications
+* **Template Name / ID:** `AppTier-Base-Image` (`lt-0302d0de9080cb106`)
+* **Default Version:** Version 5 (`fixed-monitoring`)
+* **AMI ID:** `ami-02b9ac3d3518ac013` (Hardened Ubuntu 22.04 LTS Base Image)
+* **Instance Type:** `t2.micro`
+* **Security Group:** `sg-08f9016c9dcdf3b85` (`3tier-app-sg`)
+* **Key Pair:** `caps1`
+* **Bootstrap Provisions:** Pre-installed Docker runtime, IAM Instance Profile attachment, and automated user-data scripts.
 
-<img width="1400" height="700" alt="Screenshot 2026-07-19 205048" src="https://github.com/user-attachments/assets/6e08de41-2253-472a-ba9e-ba0b314c1670" />
-ASG Details Panel
+---
 
-### Capacity Limits
-* **Minimum Capacity:** `1` (Guarantees baseline availability)
-* **Desired Capacity:** `1` (Current running fleet size)
-* **Maximum Capacity:** `4` (Prevents runaway cost during spikes)
+## 2. Auto Scaling Group (`3Tier-ASG`)
+
+The Auto Scaling Group enforces fleet capacity boundaries and distributes EC2 instances across multiple Availability Zones to eliminate single points of failure.
+
+### Fleet Capacity & Boundaries
+
+<img width="1400" height="700" alt="Auto Scaling Group Capacity Overview" src="https://github.com/user-attachments/assets/e42bcf8c-4e20-4cde-a13d-b36eb60ed38a" />
+
+* **Minimum Capacity:** `1` (Guarantees baseline application availability)
+* **Desired Capacity:** `1` (Current steady-state running instances)
+* **Maximum Capacity:** `4` (Prevents runaway costs during unexpected traffic surges)
+
+### Fleet Health & Multi-AZ Distribution
+
+<img width="1400" height="700" alt="ASG Details Panel" src="https://github.com/user-attachments/assets/6e08de41-2253-472a-ba9e-ba0b314c1670" />
+
 * **Instance Health Status:** `1/1 Healthy`
-* **Availability Zones:** Spans `2 Availability Zones`
+* **Subnet Coverage:** Spans `2 Availability Zones` (`ap-south-1a` & `ap-south-1b`)
 
 ---
 
-## 2. Activity History & Auto-Healing
+## 3. Dynamic Scaling Policy & Workflow
 
-The Auto Scaling Group monitors target health via the Application Load Balancer. If an instance fails an ELB health check, the ASG automatically terminates the degraded node and launches a fresh replacement instance.
+High compute workloads automatically trigger horizontal scaling out to maintain application latency standards.
 
-<img width="1400" height="700" alt="Screenshot 2026-07-19 192215" src="https://github.com/user-attachments/assets/65a49ed5-3da9-491d-b9dc-270fdb953c6e" />
-ASG Activity History
+### Dynamic Scaling Thresholds
+| Metric Monitored | Trigger Threshold | Action Taken | Cooldown Period |
+| :--- | :--- | :--- | :--- |
+| **`CPUUtilization`** | **CPU > 70%** | **+1 EC2 Instance** | **300 Seconds** |
 
-### Observed Event Audit Log
-1. **Capacity Adjustment:** Scaled from `0` to `1` instance upon initial cluster creation.
-2. **Constraint Updates:** Dynamically updated minimum/maximum instance parameters upon user configuration request.
-3. **Auto-Healing In Action:** Automatically detected an unhealthy instance (`i-0493fdd6c9a906876`) via ELB system health checks, terminated it, and immediately launched a replacement node (`i-0107416625bc8e745`).
-
-###  Scaling Policy
-
-| Metric | Scale Out | Action | Cooldown |
-|--------|-----------|--------|----------|
-| **CPUUtilization** | **CPU > 70%** | **+1 EC2 Instance** | **300 Seconds** |
-
-
-
-##  Scaling Workflow
+### Scaling & Registration Workflow
 
 ```mermaid
 flowchart LR
-    Traffic[" Traffic"]
-    ALB["ALB"]
-    CW["CloudWatch<br/>CPU > 70%"]
-    ASG["Auto Scaling Group"]
-    Instance["New EC2 Instance"]
+    Traffic[" User Traffic"]
+    ALB[" Application Load Balancer"]
+    CW[" CloudWatch Alarm<br/>(CPU > 70%)"]
+    ASG[" Auto Scaling Group"]
+    Instance[" New EC2 Instance"]
+    Docker[" Pull Docker Images"]
+    Target[" Register with ALB"]
 
     Traffic --> ALB
     ALB --> CW
     CW --> ASG
     ASG --> Instance
-
-    Instance --- Docker[" Pull Images"]
-    Docker --- Target[" Register with ALB"]
+    Instance --> Docker
+    Docker --> Target
 ```
----
 <br>
 
 #  <img width="25" height="25" alt="image" src="https://github.com/user-attachments/assets/b018942a-1a3f-4ca7-8e03-a3ed07a8cc37" /> Monitoring & Observability
 
 Amazon CloudWatch provides centralized monitoring by collecting real-time metrics, logs, and alarms across the application, load balancer, and database, enabling proactive performance analysis and rapid issue detection.
 
+## 📊 CloudWatch Dashboard
 
+### 🖥️ Compute Layer
 
-##   CloudWatch Dashboard
+| Metric | Purpose |
+|---------|---------|
+| CPU Utilization | Monitors EC2 processor usage |
+| Network In | Tracks incoming traffic |
+| Network Out | Tracks outgoing traffic |
+| Disk Usage | Monitors storage consumption |
 
+### ⚖️ Application Load Balancer
 
-###  Compute Layer
+| Metric | Purpose |
+|---------|---------|
+| Request Count | Total client requests |
+| Response Time | Average response latency |
+| HTTP 5XX Errors | Backend server failures |
+| Healthy Targets | Healthy EC2 instances |
 
-- **CPU Utilization:** Monitors EC2 processor usage to identify high workload conditions.
-- **Network In:** Tracks incoming network traffic received by the instance.
-- **Network Out:** Measures outbound network traffic sent from the instance.
-- **Disk Usage:** Monitors disk space consumption and storage health.
+### 🗄️ Amazon Aurora Database
 
----
-
-###  Application Load Balancer
-
-- **Request Count:** Displays the total number of client requests processed.
-- **Response Time:** Measures the average time taken to serve client requests.
-- **HTTP 5XX Errors:** Tracks server-side failures returned by backend targets.
-- **Healthy Targets:** Indicates the number of healthy EC2 instances available to receive traffic.
-
----
-
-###  Amazon Aurora Database
-
-- **Database Connections:** Monitors active client connections to the database.
-- **CPU Utilization:** Tracks database compute usage under workload.
-- **Select Latency:** Measures the average execution time of read (SELECT) queries.
-- **Insert Latency:** Measures the average execution time of write (INSERT) operations.
----
+| Metric | Purpose |
+|---------|---------|
+| Database Connections | Active database connections |
+| CPU Utilization | Database CPU usage |
+| Select Latency | Read query performance |
+| Insert Latency | Write query performance |
 
 ##  CloudWatch Alarms
 
 CloudWatch Alarms continuously monitor key infrastructure metrics and automatically trigger scaling actions or notifications when predefined thresholds are exceeded.
 
-| Alarm | Trigger Condition | Evaluation Period | Action |
-|-------|-------------------|-------------------|--------|
-| ** High CPU Alarm** | **CPU Utilization > 70%** | **1 Minute** | Scale out the Auto Scaling Group by launching a new EC2 instance. |
-| ** Aurora Connection Alarm** | **Database Connections > 80%** | Continuous Monitoring | Send a CloudWatch notification for administrator intervention. |
+
+To validate the responsiveness of the alerting system, a synthetic CPU load was generated on the EC2 instance using the Linux `stress` benchmark tool.
+
+![CloudWatch CPU High Alarm Verification](./assets/monitoring-cpu-stress-alarm.jpg)
+
+### Stress Test & Alarm Execution Flow
+1. **Load Generation (Terminal):** Executed `stress --cpu 2 --timeout 100` via terminal, driving total instance CPU utilization to **100%**.
+2. **Metric Spiking:** CloudWatch collected high-frequency datapoints showing CPU usage surging from a baseline of **1.57%** up to **99.5%**.
+3. **Threshold Breach:** The metric exceeded the configured alert threshold line (**CPUUtilization > 50%**).
+4. **Alarm State Change:** The `Main-Server-CPU-High` alarm immediately transitioned from `OK` to **`In alarm`** state, validating real-time threat/overload detection.
+
+---
+
+## 2. Active Alarm Matrix
+
+CloudWatch Alarms monitor key metrics across the infrastructure to trigger notifications or Auto Scaling actions.
+
+| Alarm Name | Monitored Metric | Threshold Condition | Purpose |
+| :--- | :--- | :--- | :--- |
+| **`Main-Server-CPU-High`** | `CPUUtilization` | `> 50% for 1 datapoint` | Alerts administrators of unexpected process overload or high application traffic. |
+| **`ASG-CPU-High`** | `CPUUtilization` | `> 70% for 5 minutes` | Triggers the Auto Scaling Group to scale out (+1 EC2 instance). |
+| **`ASG-CPU-Low`** | `CPUUtilization` | `< 20% for 5 minutes` | Triggers the Auto Scaling Group to scale in (-1 EC2 instance) to save costs. |
+
 
 <br>
 
