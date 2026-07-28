@@ -65,6 +65,9 @@ The primary objective of this project is to implement a **highly available**, **
 |  **Fault Isolation** | Failures in one tier have minimal impact on the others. |
 |  **Operational Reliability** | High availability through Auto Scaling, ALB, and Aurora Multi-AZ. |
 
+## Deployment Pipeline
+<img width="900" height="520" alt="deployment" src="https://github.com/user-attachments/assets/3799468a-3c69-4a86-9ab0-fdea6ae864b0" />
+
 <br>
 
 #  Live Demos & Proof of Execution
@@ -214,7 +217,9 @@ The entire VPC topology spans multiple Availability Zones (`ap-south-1a`, `ap-so
 To enforce strict network security, the database security group permits inbound MySQL/Aurora traffic (port `3306`) exclusively from the **Application Security Group ID** (`sg-08f9016c9dcdf3b85`).
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 201028" src="https://github.com/user-attachments/assets/d254e6dd-1c82-491c-adbb-793efa3f8ae1" />
-Amazon Aurora Security Group Inbound Rules
+<p align="center">
+  <font color="gray"><i>Amazon Aurora Security Group Inbound Rules</i></font>
+</p>
 
 <br>
 
@@ -911,7 +916,6 @@ Traffic is routed to specific microservices/tiers based on port listeners and pa
 
 The compute layer automatically scales instance capacity up or down based on real-time traffic demands, ensuring performance stability while optimizing infrastructure costs.
 
----
 
 ## 1. EC2 Launch Template (`AppTier-Base-Image`)
 
