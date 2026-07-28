@@ -879,7 +879,7 @@ The load balancing tier acts as the public entry point for incoming application 
 
 The internet-facing ALB distributes HTTP/HTTPS traffic across public subnets spanning multiple Availability Zones (`ap-south-1a` and `ap-south-1b`) for high availability.
 
-<img width="900" height="700" alt="Application Load Balancer Overview" src="https://github.com/user-attachments/assets/1eaef714-f9fe-4910-bca1-94743898a1d3" />
+<img width="900" height="520" alt="Application Load Balancer Overview" src="https://github.com/user-attachments/assets/1eaef714-f9fe-4910-bca1-94743898a1d3" />
 
 ### ALB Specifications
 * **Name:** `3Tier-Alb`
@@ -894,7 +894,7 @@ The internet-facing ALB distributes HTTP/HTTPS traffic across public subnets spa
 
 Traffic is routed to specific microservices/tiers based on port listeners and path-based rules. Continuous health checks ensure degraded nodes are automatically pulled out of rotation.
 
-<img width="900" height="700" alt="Target Groups and Registered Targets" src="https://github.com/user-attachments/assets/2ba06003-2ccd-4322-8f98-35e2ccd0c278" />
+<img width="900" height="520" alt="Target Groups and Registered Targets" src="https://github.com/user-attachments/assets/2ba06003-2ccd-4322-8f98-35e2ccd0c278" />
 
 ### Target Group Summary
 | Target Group Name | Port | Protocol | Target Type | VPC | Associated Load Balancer |
@@ -919,7 +919,7 @@ The compute layer automatically scales instance capacity up or down based on rea
 
 Auto Scaling instances are launched dynamically using a version-controlled Launch Template that pre-configures OS settings, security profiles, and bootstrap scripts.
 
-<img width="900" height="700" alt="EC2 Launch Template Details" src="https://github.com/user-attachments/assets/87fea585-a983-4f2f-93a4-d76d9b762721" />
+<img width="900" height="520" alt="EC2 Launch Template Details" src="https://github.com/user-attachments/assets/87fea585-a983-4f2f-93a4-d76d9b762721" />
 
 ### Launch Template Specifications
 * **Template Name / ID:** `AppTier-Base-Image` (`lt-0302d0de9080cb106`)
@@ -938,7 +938,7 @@ The Auto Scaling Group enforces fleet capacity boundaries and distributes EC2 in
 
 ### Fleet Capacity & Boundaries
 
-<img width="900" height="700" alt="Auto Scaling Group Capacity Overview" src="https://github.com/user-attachments/assets/e42bcf8c-4e20-4cde-a13d-b36eb60ed38a" />
+<img width="900" height="520" alt="Auto Scaling Group Capacity Overview" src="https://github.com/user-attachments/assets/e42bcf8c-4e20-4cde-a13d-b36eb60ed38a" />
 
 * **Minimum Capacity:** `1` (Guarantees baseline application availability)
 * **Desired Capacity:** `1` (Current steady-state running instances)
@@ -946,7 +946,7 @@ The Auto Scaling Group enforces fleet capacity boundaries and distributes EC2 in
 
 ### Fleet Health & Multi-AZ Distribution
 
-<img width="900" height="700" alt="ASG Details Panel" src="https://github.com/user-attachments/assets/6e08de41-2253-472a-ba9e-ba0b314c1670" />
+<img width="900" height="520" alt="ASG Details Panel" src="https://github.com/user-attachments/assets/6e08de41-2253-472a-ba9e-ba0b314c1670" />
 
 * **Instance Health Status:** `1/1 Healthy`
 * **Subnet Coverage:** Spans `2 Availability Zones` (`ap-south-1a` & `ap-south-1b`)
