@@ -101,6 +101,7 @@ A synthetic CPU stress test (`stress --cpu 2`) pushes server utilization to 100%
 <video src="YOUR_MONITORING_VIDEO_URL_HERE" width="100%" controls autoplay loop></video>
 
 https://github.com/user-attachments/assets/d005f437-3446-4059-96c2-3121bf3c0f7f
+
 ---
 
 # Table of Contents
@@ -162,8 +163,7 @@ The entire infrastructure resides inside a dedicated VPC.
 The entire VPC topology spans multiple Availability Zones (`ap-south-1a`, `ap-south-1b`, and `ap-south-1c`) with isolated public and private subnets.
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 121155" src="https://github.com/user-attachments/assets/92c3794f-2a49-403d-97ab-65d7770e8588" />
-
-- VPC Resource Map Topology
+<p align="center"><font color="gray"><i>VPC Resource Map Topology</i></font></p>
 
 - Public subnets route outbound internet requests through a custom Route Table (`3tierapp-RT`) attached to the Internet Gateway (`3tierapp-igw`).
 
@@ -217,9 +217,7 @@ The entire VPC topology spans multiple Availability Zones (`ap-south-1a`, `ap-so
 To enforce strict network security, the database security group permits inbound MySQL/Aurora traffic (port `3306`) exclusively from the **Application Security Group ID** (`sg-08f9016c9dcdf3b85`).
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 201028" src="https://github.com/user-attachments/assets/d254e6dd-1c82-491c-adbb-793efa3f8ae1" />
-<p align="center">
-  <font color="gray"><i>Amazon Aurora Security Group Inbound Rules</i></font>
-</p>
+<p align="center"><font color="gray"><i>Amazon Aurora Security Group Inbound Rules</i></font></p>
 
 <br>
 
@@ -356,7 +354,7 @@ Active compute instances are assigned both private IP addresses within the VPC C
 | IAM Role | 3Tier-EC2-Execution-Role |
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 120929" src="https://github.com/user-attachments/assets/f35be21f-8f47-410d-869c-bb13d15008d8" />
-EC2 Running Instances Console
+<p align="center"><font color="gray"><i>EC2 Running Instances Console</i></font></p>
 
 * **`Apptier` Instance:** `t2.medium` residing in `ap-south-1b` (Public IP: `3.109.153.132`, Private IP: `10.0.4.195`).
 * **`Dbtier` Instance:** `t3.micro` residing in `ap-south-1a` (Private IP: `13.127.247.85`).
@@ -490,7 +488,7 @@ networks:
 ```
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 195123" src="https://github.com/user-attachments/assets/bd60ba55-e26c-441e-93b1-a3daf4177a00" />
-Docker Containers and Nginx Health Checks
+<p align="center"><font color="gray"><i>Docker Containers and Nginx Health Checks</i></font></p>
 
 **Command Line Verification:**
 * **Container Status (`docker ps -a`):** Confirms both the `web-tier` (React/Nginx) and `app-tier` (Node.js) containers are actively running and mapped to their respective ports (80 and 4000).
@@ -503,7 +501,7 @@ Docker Containers and Nginx Health Checks
 To verify the Zero-Trust network architecture and database integration, live transactions were processed through the frontend. 
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 195708" src="https://github.com/user-attachments/assets/746502ff-a592-49fc-b35a-c83032b89768" />
-React Frontend and Node.js Database Logs
+<p align="center"><font color="gray"><i>React Frontend and Node.js Database Logs</i></font></p>
 
 **Verification Flow:**
 1. **Presentation Tier:** The React UI successfully loads and accepts user input for database entry.
@@ -538,7 +536,7 @@ graph LR
 Amazon ECR serves as the secure, private container registry for the 3-tier architecture. It stores version-controlled Docker container images compiled by **AWS CodeBuild** during the CI/CD pipeline and distributes them to the application compute nodes.
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 192315" src="https://github.com/user-attachments/assets/4104247d-6355-4522-b4f3-ca0700f94298" />
-Amazon ECR Private Repositories Listing
+<p align="center"><font color="gray">Amazon ECR Private Repositories Listing</i></font></p>
 
 ### Repository Architecture
 | Repository Name |  Tag Immutability | Encryption Type | Purpose |
@@ -551,7 +549,7 @@ Amazon ECR Private Repositories Listing
 The backend repository stores compiled Node.js application images. CodeBuild tags the latest successful build as `latest`, which is subsequently pulled down by the EC2 instances during automated deployments.
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 192323" src="https://github.com/user-attachments/assets/481c6a56-9084-4611-811c-580bbabde77d" />
-Backend App Tier Image Registry
+<p align="center"><font color="gray">Backend App Tier Image Registry</i></font></p>
 
 ### Artifact & Verification Metrics
 * **Active Image Tag:** `latest` (Maps to SHA-256 Digest: `sha256:77a026f7bf12da2...`)
@@ -566,7 +564,7 @@ Backend App Tier Image Registry
 The frontend repository stores optimized React/Nginx static web server images produced during the build stage.
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 192329" src="https://github.com/user-attachments/assets/26379f89-5746-4a97-b831-d1e1618aaec9" />
-Frontend Web Tier Image Registry
+<p align="center"><font color="gray">Frontend Web Tier Image Registry</i></font></p>
 
 ### Artifact & Verification Metrics
 * **Active Image Tag:** `latest` (Maps to SHA-256 Digest: `sha256:80207c1ab3170d...`)
@@ -677,7 +675,7 @@ flowchart LR
 ```
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 201215" src="https://github.com/user-attachments/assets/77109178-2529-4996-8a02-4d0a5930419f" />
-SSM Fleet Manager Managed Nodes
+<p align="center"><font color="gray">SSM Fleet Manager Managed Nodes</i></font></p>
 
 * **Node ID:** `i-0278e37739dd247ff` (`Apptier`)
 * **Ping Status:** `Online` (Agent v3.3.4793.0 active)
@@ -689,7 +687,7 @@ SSM Fleet Manager Managed Nodes
 The database layer is powered by **Amazon Aurora MySQL-Compatible Edition**, providing high availability, automatic failover, and Multi-AZ replication.
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 200627" src="https://github.com/user-attachments/assets/32ca1c39-fb61-4afc-9341-804872c15d69" />
-Database Connectivity and Security Details
+<p align="center"><font color="gray">Database Connectivity and Security Details</i></font></p>
 
 ## Cluster Configuration
 
@@ -748,7 +746,7 @@ To reduce latency and improve global performance, the application uses **Amazon 
 Amazon Route 53 provides highly available DNS routing by resolving your custom domain to the CloudFront distribution. It integrates with **AWS Certificate Manager (ACM)** for SSL/TLS validation, ensuring secure HTTPS access to the application.
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 203917" src="https://github.com/user-attachments/assets/1759b0ae-d04b-4edb-84e8-191977b29da5" />
-Amazon Route 53 Hosted Zone Records
+<p align="center"><font color="gray">Amazon Route 53 Hosted Zone Records</i></font></p>
 
 ### DNS Record Architecture
 | Record Name | Type | Routing | Value / Target | Purpose |
@@ -781,7 +779,7 @@ graph LR
 To enforce Zero-Trust end-to-end transport security, an **AWS-managed SSL/TLS certificate** was issued in `us-east-1` (North Virginia) to enable HTTPS across the global CloudFront edge locations.
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 202922" src="https://github.com/user-attachments/assets/c90a37b4-2373-492b-b278-02359dbb89f4" />
-AWS Certificate Manager ACM Status
+<p align="center"><font color="gray">AWS Certificate Manager ACM Status</i></font></p>
 
 ### Certificate Details
 * **Domain Name:** `threetierapp.click`
@@ -797,7 +795,7 @@ AWS Certificate Manager ACM Status
 ###  CloudFront Distribution Profile
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 202857" src="https://github.com/user-attachments/assets/d98676ff-1fc4-4fb4-baf8-2752ab39bda9" />
-CloudFront General Settings and Alternate Domains
+<p align="center"><font color="gray">CloudFront General Settings and Alternate Domains</i></font></p>
 
 | **Property** | **Value** |
 |--------------|-----------|
@@ -824,7 +822,7 @@ graph LR
 CloudFront is configured with Elastic Load Balancing origins to forward dynamic API requests directly to the Application Load Balancer (`3Tier-Alb`).
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 202819" src="https://github.com/user-attachments/assets/bd6a7829-5f94-41f5-861c-983e72893814" />
-CloudFront Origins Configuration
+<p align="center"><font color="gray">CloudFront Origins Configuration</i></font></p>
 
 ### Origin Mapping
 | **Origin Name** | **Origin Endpoint** | **Origin Type** |
@@ -844,7 +842,7 @@ graph LR
 Real-time telemetry and threat analytics monitor incoming traffic for suspicious behavior, cross-site scripting (XSS), and malicious IP activity before requests reach the core compute infrastructure.
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 203243" src="https://github.com/user-attachments/assets/158bfbe1-713f-405e-aa22-59e7d270b0dc" />
-CloudFront Threat Analytics Dashboard
+<p align="center"><font color="gray">CloudFront Threat Analytics Dashboard</i></font></p>
 
 ### Telemetry Insights
 | **Feature** | **Description** |
@@ -859,7 +857,7 @@ CloudFront Threat Analytics Dashboard
 Live verification confirms HTTP-to-HTTPS redirection, SSL/TLS handshake execution, and CloudFront response headers on the live production domain (`https://threetierapp.click`).
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 203654" src="https://github.com/user-attachments/assets/17c437c2-410b-4fc0-bf77-764188a52f45" />
-Browser DevTools Live Response Headers
+<p align="center"><font color="gray">Browser DevTools Live Response Headers</i></font></p>
 
 ### Verified Header Signatures
 | **Header** | **Observed Value** | **Purpose** |
@@ -1026,7 +1024,7 @@ CloudWatch Alarms continuously monitor key infrastructure metrics and automatica
 To validate the responsiveness of the alerting system, a synthetic CPU load was generated on the EC2 instance using the Linux `stress` benchmark tool.
 
 <img width="900" height="520" alt="Screenshot 2026-07-19 201837" src="https://github.com/user-attachments/assets/e30a27ed-dcc0-4283-9d00-d969d8fa9623" />
-CloudWatch CPU High Alarm Verification
+<p align="center"><font color="gray">CloudWatch CPU High Alarm Verification</i></font></p>
 
 ### Stress Test & Alarm Execution Flow
 1. **Load Generation (Terminal):** Executed `stress --cpu 2 --timeout 100` via terminal, driving total instance CPU utilization to **100%**.
