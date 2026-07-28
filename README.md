@@ -77,6 +77,7 @@ Below are real-time demonstrations proving the end-to-end automation, dynamic sc
 A single code commit pushed to GitHub triggers the automated pipeline: **CodePipeline** catches the webhook $\rightarrow$ **CodeBuild** compiles Docker images & pushes to **ECR** $\rightarrow$ **CodeDeploy** executes `deploy.sh` via **AWS Systems Manager (SSM)** to roll out fresh containers without manual SSH access.
 
 <video src="YOUR_CICD_VIDEO_URL_HERE" width="100%" controls autoplay loop></video>
+
 https://github.com/user-attachments/assets/0108d49f-444f-4d93-bd7e-a92e53f9b8a3
 
 
@@ -85,6 +86,7 @@ https://github.com/user-attachments/assets/0108d49f-444f-4d93-bd7e-a92e53f9b8a3
 Demonstrates dynamic data flow across all three layers: React Frontend $\rightarrow$ Containerized Node.js API $\rightarrow$ Isolated **Amazon Aurora MySQL** Database residing inside a private subnet.
 
 <video src="YOUR_DB_VIDEO_URL_HERE" width="100%" controls autoplay loop></video>
+
 https://github.com/user-attachments/assets/e86606f4-9df9-4527-bfb4-284b4508b1da
 
 
