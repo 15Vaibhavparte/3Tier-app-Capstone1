@@ -12,52 +12,7 @@ This project demonstrates modern **Cloud Engineering** and **DevOps** design pat
 -  Containerized application deployment
 -  High availability with Auto Scaling & Load Balancing
 
-
-#  Project Overview
-
-The primary objective of this project is to implement a **highly available**, **fault-tolerant**, and **secure** enterprise-grade application delivery platform on AWS using a modern **3-tier architecture**.
-
-| **Tier** | **Components** | **Key Features** |
-|----------|----------------|------------------|
-|  **Presentation Tier** | React, Nginx | Static asset hosting, Reverse proxy, API routing |
-|  **Application Tier** | Node.js, Express.js | Business logic, REST APIs, Docker containers, Amazon EC2, Auto Scaling Group |
-|  **Database Tier** | Amazon Aurora MySQL | Multi-AZ deployment, Private subnets, Automatic failover, Read replicas, High availability |
-
-##  Architecture Benefits
-
-| Benefit | Description |
-|----------|-------------|
-|  **Scalability** | Scale application instances automatically based on demand. |
-|  **Security** | Network isolation using Security Groups and private database subnets. |
-|  **Maintainability** | Independent deployment and management of each application tier. |
-|  **Fault Isolation** | Failures in one tier have minimal impact on the others. |
-|  **Operational Reliability** | High availability through Auto Scaling, ALB, and Aurora Multi-AZ. |
-
-<br>
-
-#  Table of Contents
-
-# Table of Contents
-
-1. [ Project Overview](#-project-overview)
-2. [Application Stack](#application-stack)
-3. [ Prerequisites](#-prerequisites)
-4. [Core Infrastructure Setup](#core-infrastructure-setup)
-5. [IAM Roles & Security Configuration](#iam-roles--security-configuration)
-6. [EC2 Instance Configuration & Deployment Automation](#ec2-instance-configuration--deployment-automation)
-7. [Deployment Strategy](#deployment-strategy)
-8. [Amazon Elastic Container Registry (ECR)](#amazon-elastic-container-registry-ecr)
-9. [AWS Systems Manager (SSM)](#aws-systems-manager-ssm)
-10. [Amazon Aurora Database Setup](#amazon-aurora-database-setup)
-11. [DNS & Content Delivery Network (CDN) Configuration](#dns--content-delivery-network-cdn-configuration)
-12. [Auto Scaling & Load Balancing](#auto-scaling--load-balancing)
-13. [Auto Scaling Group (ASG)](#auto-scaling-group-asg)
-14. [Monitoring & Observability](#monitoring--observability)
-15. [Future Scope](#future-scope)
-
----
-
-# Application Stack
+## Application Stack
 
 
 
@@ -85,7 +40,80 @@ The primary objective of this project is to implement a **highly available**, **
 [![Nginx](https://img.shields.io/badge/Nginx-Reverse_Proxy-009639?logo=nginx)](https://nginx.org/)
 [![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?logo=mysql)](https://www.mysql.com/)
 [![Git](https://img.shields.io/badge/Git-Version_Control-F05032?logo=git)](https://git-scm.com/)
+
+
+
+#  Project Overview
+
+The primary objective of this project is to implement a **highly available**, **fault-tolerant**, and **secure** enterprise-grade application delivery platform on AWS using a modern **3-tier architecture**.
+
+| **Tier** | **Components** | **Key Features** |
+|----------|----------------|------------------|
+|  **Presentation Tier** | React, Nginx | Static asset hosting, Reverse proxy, API routing |
+|  **Application Tier** | Node.js, Express.js | Business logic, REST APIs, Docker containers, Amazon EC2, Auto Scaling Group |
+|  **Database Tier** | Amazon Aurora MySQL | Multi-AZ deployment, Private subnets, Automatic failover, Read replicas, High availability |
+
+<img width="900" height="620" alt="aws infra" src="https://github.com/user-attachments/assets/a6287df6-568e-4dfe-9f3f-694f053a1fb0" />
+
+##  Architecture Benefits
+
+| Benefit | Description |
+|----------|-------------|
+|  **Scalability** | Scale application instances automatically based on demand. |
+|  **Security** | Network isolation using Security Groups and private database subnets. |
+|  **Maintainability** | Independent deployment and management of each application tier. |
+|  **Fault Isolation** | Failures in one tier have minimal impact on the others. |
+|  **Operational Reliability** | High availability through Auto Scaling, ALB, and Aurora Multi-AZ. |
+
+<br>
+
+#  Live Demos & Proof of Execution
+
+Below are real-time demonstrations proving the end-to-end automation, dynamic scaling, and zero-touch CI/CD pipeline of this 3-tier architecture.
+
 ---
+
+### 1.  Continuous Delivery (Zero-Touch CI/CD Pipeline)
+A single code commit pushed to GitHub triggers the automated pipeline: **CodePipeline** catches the webhook $\rightarrow$ **CodeBuild** compiles Docker images & pushes to **ECR** $\rightarrow$ **CodeDeploy** executes `deploy.sh` via **AWS Systems Manager (SSM)** to roll out fresh containers without manual SSH access.
+
+<video src="YOUR_CICD_VIDEO_URL_HERE" width="100%" controls autoplay loop></video>
+
+---
+
+### 2.  Auto-Healing & Synthetic Load Testing
+A synthetic CPU stress test (`stress --cpu 2`) pushes server utilization to 100%. **Amazon CloudWatch** detects the anomaly, triggers an alert state, and signals the **Auto Scaling Group** to automatically launch a new EC2 instance to balance the load.
+
+<video src="YOUR_MONITORING_VIDEO_URL_HERE" width="100%" controls autoplay loop></video>
+
+---
+
+### 3.  End-to-End 3-Tier Data Flow
+Demonstrates dynamic data flow across all three layers: React Frontend $\rightarrow$ Containerized Node.js API $\rightarrow$ Isolated **Amazon Aurora MySQL** Database residing inside a private subnet.
+
+<video src="YOUR_DB_VIDEO_URL_HERE" width="100%" controls autoplay loop></video>
+
+---
+
+# Table of Contents
+
+1. [ Project Overview](#-project-overview)
+2. [Live Demos & Proof of Execution](#-live-Demos-&-Proof-of-Execution)
+3. [ Prerequisites](#-prerequisites)
+4. [Core Infrastructure Setup](#core-infrastructure-setup)
+5. [IAM Roles & Security Configuration](#iam-roles--security-configuration)
+6. [EC2 Instance Configuration & Deployment Automation](#ec2-instance-configuration--deployment-automation)
+7. [Deployment Strategy](#deployment-strategy)
+8. [Amazon Elastic Container Registry (ECR)](#amazon-elastic-container-registry-ecr)
+9. [AWS Systems Manager (SSM)](#aws-systems-manager-ssm)
+10. [Amazon Aurora Database Setup](#amazon-aurora-database-setup)
+11. [DNS & Content Delivery Network (CDN) Configuration](#dns--content-delivery-network-cdn-configuration)
+12. [Auto Scaling & Load Balancing](#auto-scaling--load-balancing)
+13. [Auto Scaling Group (ASG)](#auto-scaling-group-asg)
+14. [Monitoring & Observability](#monitoring--observability)
+15. [Future Scope](#future-scope)
+
+
+
 
 # ⚙️ Prerequisites
 
@@ -116,9 +144,6 @@ Continuous deployments are performed without SSH access by leveraging AWS native
 <br>
 
 #  Core Infrastructure Setup
-###  Key Architectural Pillars
-
-<img width="900" height="620" alt="aws infra" src="https://github.com/user-attachments/assets/a6287df6-568e-4dfe-9f3f-694f053a1fb0" />
 
 The entire infrastructure resides inside a dedicated VPC.
 
@@ -129,49 +154,7 @@ The entire VPC topology spans multiple Availability Zones (`ap-south-1a`, `ap-so
 
 ![VPC Resource Map Topology](./assets/vpc-resource-map-overview.jpg)
 
-* **Public Subnets:** `AppTier-public` (`10.0.1.0/24`) and `Apptier-public-subnet2` (`10.0.2.0/24`) host the web and application compute nodes.
-* **Private Subnets:** `DbTier-private1` (`10.0.3.0/24`) and `DbTier-private2` (`10.0.4.0/24`) host the isolated database instances.
-
----
-
-### Public Subnet Route Table Mapping
-
-Public subnets route outbound internet requests through a custom Route Table (`3tierapp-RT`) attached to the Internet Gateway (`3tierapp-igw`).
-
-![Public Subnet Internet Gateway Route Mapping](./assets/vpc-public-subnet-routing.jpg)
-
----
-
-```
-3tierapp-VPC
-CIDR:
-10.0.0.0/16
-```
-
-Availability Zones:
-
-- ap-south-1a
-- ap-south-1b
-
----
-
-## VPC Layout
-
-```text
-3tierapp-VPC
-│
-├── Public Subnet (10.0.1.0/24)
-│      Web Tier
-│
-├── Public Subnet (10.0.2.0/24)
-│      Auto Scaling
-│
-├── Private DB Subnet (10.0.3.0/24)
-│
-└── Private DB Subnet (10.0.4.0/24)
-```
-
----
+- Public subnets route outbound internet requests through a custom Route Table (`3tierapp-RT`) attached to the Internet Gateway (`3tierapp-igw`).
 
 ## Subnet Architecture
 
