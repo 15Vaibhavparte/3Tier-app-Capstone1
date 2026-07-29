@@ -41,6 +41,23 @@ This project demonstrates modern **Cloud Engineering** and **DevOps** design pat
 [![MySQL](https://img.shields.io/badge/MySQL-Database-4479A1?logo=mysql)](https://www.mysql.com/)
 [![Git](https://img.shields.io/badge/Git-Version_Control-F05032?logo=git)](https://git-scm.com/)
 
+# Table of Contents
+
+1. [ Project Overview](#-project-overview)
+2. [Live Demos & Proof of Execution](#-live-Demos-&-Proof-of-Execution)
+3. [ Prerequisites](#-prerequisites)
+4. [Core Infrastructure Setup](#core-infrastructure-setup)
+5. [IAM Roles & Security Configuration](#iam-roles--security-configuration)
+6. [EC2 Instance Configuration & Deployment Automation](#ec2-instance-configuration--deployment-automation)
+7. [Deployment Strategy](#deployment-strategy)
+8. [Amazon Elastic Container Registry (ECR)](#amazon-elastic-container-registry-ecr)
+9. [AWS Systems Manager (SSM)](#aws-systems-manager-ssm)
+10. [Amazon Aurora Database Setup](#amazon-aurora-database-setup)
+11. [DNS & Content Delivery Network (CDN) Configuration](#dns--content-delivery-network-cdn-configuration)
+12. [Auto Scaling & Load Balancing](#auto-scaling--load-balancing)
+13. [Auto Scaling Group (ASG)](#auto-scaling-group-asg)
+14. [Monitoring & Observability](#monitoring--observability)
+15. [Future Scope](#future-scope)
 
 
 #  Project Overview
@@ -103,25 +120,6 @@ A synthetic CPU stress test (`stress --cpu 2`) pushes server utilization to 100%
 https://github.com/user-attachments/assets/d005f437-3446-4059-96c2-3121bf3c0f7f
 
 ---
-
-# Table of Contents
-
-1. [ Project Overview](#-project-overview)
-2. [Live Demos & Proof of Execution](#-live-Demos-&-Proof-of-Execution)
-3. [ Prerequisites](#-prerequisites)
-4. [Core Infrastructure Setup](#core-infrastructure-setup)
-5. [IAM Roles & Security Configuration](#iam-roles--security-configuration)
-6. [EC2 Instance Configuration & Deployment Automation](#ec2-instance-configuration--deployment-automation)
-7. [Deployment Strategy](#deployment-strategy)
-8. [Amazon Elastic Container Registry (ECR)](#amazon-elastic-container-registry-ecr)
-9. [AWS Systems Manager (SSM)](#aws-systems-manager-ssm)
-10. [Amazon Aurora Database Setup](#amazon-aurora-database-setup)
-11. [DNS & Content Delivery Network (CDN) Configuration](#dns--content-delivery-network-cdn-configuration)
-12. [Auto Scaling & Load Balancing](#auto-scaling--load-balancing)
-13. [Auto Scaling Group (ASG)](#auto-scaling-group-asg)
-14. [Monitoring & Observability](#monitoring--observability)
-15. [Future Scope](#future-scope)
-
 
 
 
